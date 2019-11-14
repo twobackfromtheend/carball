@@ -1,7 +1,11 @@
+import logging
+
 from api.game.game_pb2 import Game
 from api.game.player_pb2 import Player
 from carball.json_parser.game import Game as JsonParserGame
 from carball.json_parser.player import Player as JsonParserPlayer
+
+logger = logging.getLogger(__name__)
 
 
 def add_players(json_parser_game: JsonParserGame, game: Game):
@@ -36,7 +40,7 @@ def set_camera_settings(json_parser_player: JsonParserPlayer, player: Player):
             json_parser_value = json_parser_camera_settings.get(attribute, None)
             setattr(camera_settings, attribute, json_parser_value)
         except TypeError as e:
-            print(f"Could not set camera_settings attribute: {attribute}: {e}")
+            logger.warning(f"Could not set camera_settings attribute: {attribute}: {e}")
 
 
 def set_loadout(json_parser_player: JsonParserPlayer, player: Player):

@@ -1,3 +1,6 @@
+import re
+from typing import Optional
+
 from .base import *
 
 BOOST_PER_SECOND = 80 * 1 / .93  # boost used per second out of 255
@@ -5,20 +8,20 @@ REPLICATED_PICKUP_KEY = 'TAGame.VehiclePickup_TA:ReplicatedPickupData'
 REPLICATED_PICKUP_KEY_168 = 'TAGame.VehiclePickup_TA:NewReplicatedPickupData'
 
 
-def get_boost_actor_data(actor: dict):
+def get_boost_actor_data(actor: dict) -> Optional[dict]:
     if REPLICATED_PICKUP_KEY in actor:
-        actor = actor[REPLICATED_PICKUP_KEY]
-        if actor is not None and actor != -1:
-            actor = actor['pickup']
-            if actor is not None and 'instigator_id' in actor and actor["instigator_id"] != -1:
-                return actor
+        replicated_pickup_data_actor = actor[REPLICATED_PICKUP_KEY]
+        if replicated_pickup_data_actor:
+            pickup_actor = replicated_pickup_data_actor['pickup']
     elif REPLICATED_PICKUP_KEY_168 in actor:
-        actor = actor[REPLICATED_PICKUP_KEY_168]
-        if actor is not None and actor != -1:
-            actor = actor['pickup_new']
-            if actor is not None and 'instigator_id' in actor and actor["instigator_id"] != -1:
-                return actor
-    return None
+        replicated_pickup_data_actor = actor[REPLICATED_PICKUP_KEY_168]
+        if replicated_pickup_data_actor:
+            pickup_actor = replicated_pickup_data_actor['pickup_new']
+    else:
+        return
+
+    if 'instigator_id' in pickup_actor and pickup_actor['instigator_id'] != -1:
+        return pickup_actor
 
 
 class BoostHandler(BaseActorHandler):
@@ -57,33 +60,18 @@ class BoostPickupHandler(BaseActorHandler):
         return actor['ClassName'] == 'TAGame.VehiclePickup_Boost_TA'
 
     def update(self, actor: dict, frame_number: int, time: float, delta: float) -> None:
-        boost_actor = get_boost_actor_data(actor)
-        if boost_actor is not None:
-            car_actor_id = boost_actor['instigator_id']
+        pickup_actor = get_boost_actor_data(actor)
+        if pickup_actor is not None:
+            car_actor_id = pickup_actor['instigator_id']
             if car_actor_id in self.parser.car_player_ids:
                 player_actor_id = self.parser.car_player_ids[car_actor_id]
                 if frame_number in self.parser.player_data[player_actor_id]:
-                    actor = self.parser.player_data[player_actor_id]
-                    frame_number_look_back = frame_number - 1
-                    previous_boost_data = None
-                    while frame_number_look_back >= 0:
-                        try:
-                            previous_boost_data = actor[frame_number_look_back]['boost']
-                            if previous_boost_data is not None:
-                                break
-                        except KeyError:
-                            pass
-                        frame_number_look_back -= 1
-                    try:
-                        current_boost_data = actor[frame_number]['boost']
-                    except KeyError:
-                        current_boost_data = None
-
-                    # Ignore any phantom boosts
-                    if previous_boost_data is not None and current_boost_data is not None:
-                        if previous_boost_data < 255 and previous_boost_data < current_boost_data:
-                            actor[frame_number]['boost_collect'] = True
-                            # set to false after acknowledging it's turned True
-                            # it does not turn back false immediately although boost is only collected once.
-                            # using actor_id!=-1
-                            boost_actor["instigator_id"] = -1
+                    type_name = actor['TypeName']
+                    match = re.match(r".*VehiclePickup_Boost_TA_(\d*)$", type_name)
+                    boost_id = int(match.group(1))
+                    self.parser.player_data[player_actor_id][frame_number]['potential_boost_collect'] = boost_id
+                    # TODO: Investigate and fix random imaginary boost collects
+                # set to false after acknowledging it's turned True
+                # it does not turn back false immediately although boost is only collected once.
+                # using actor_id!=-1
+                pickup_actor["instigator_id"] = -1

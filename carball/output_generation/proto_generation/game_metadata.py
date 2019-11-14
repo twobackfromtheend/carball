@@ -1,5 +1,9 @@
+import logging
+
 from api.game.game_pb2 import Game
 from carball.json_parser.game import Game as JsonParserGame
+
+logger = logging.getLogger(__name__)
 
 
 def set_metadata(json_parser_game: JsonParserGame, game: Game):
@@ -23,7 +27,7 @@ def set_metadata(json_parser_game: JsonParserGame, game: Game):
     try:
         metadata.primary_player.id = json_parser_game.primary_player['id']
     except TypeError as e:
-        print(f"Could not set primary_player.id: {e}")
+        logger.warning(f"Could not set primary_player.id: {e}")
 
     try:
         metadata.playlist = json_parser_game.game_info.playlist
@@ -36,7 +40,7 @@ def set_metadata(json_parser_game: JsonParserGame, game: Game):
             raise ValueError("match_guid from JsonParserGame is empty string.")
         metadata.match_guid = json_parser_game.game_info.match_guid
     except Exception as e:
-        print(f"Could not set primary_player.id: {e}")
+        logger.warning(f"Could not set match_guid: {e}")
 
     set_game_score(json_parser_game, game)
     add_goals(json_parser_game, game)

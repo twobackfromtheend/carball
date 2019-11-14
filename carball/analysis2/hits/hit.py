@@ -1,3 +1,4 @@
+import logging
 from typing import List, Dict
 
 import numpy as np
@@ -7,7 +8,9 @@ from rlutilities.simulation import Game, Ball
 
 from api.analysis.hit_pb2 import Hit
 from carball.json_parser.game import Game as JsonParserGame
-from carball.output_generation.data_frame_generation.data_frame import DF_BALL_PREFIX, DF_GAME_PREFIX
+from carball.output_generation.data_frame_generation.prefixes import DF_GAME_PREFIX, DF_BALL_PREFIX
+
+logger = logging.getLogger(__name__)
 
 
 def get_hits(json_parser_game: JsonParserGame, df: pd.DataFrame) -> List[Hit]:
@@ -47,7 +50,7 @@ def get_hits(json_parser_game: JsonParserGame, df: pd.DataFrame) -> List[Hit]:
             )
         except KeyError as e:
             if e.args[0] == hit_team_no:
-                print(f"Team {hit_team_no} did not hit the ball")
+                logger.warning(f"Team {hit_team_no} did not hit the ball")
             else:
                 raise e
 
@@ -78,7 +81,7 @@ def get_hits(json_parser_game: JsonParserGame, df: pd.DataFrame) -> List[Hit]:
 
 def get_hit_frame_numbers(df: pd.DataFrame):
     hit_frame_numbers = get_hit_frame_numbers_by_ball_ang_vel(df)
-    print("hit", hit_frame_numbers)
+    logger.info(f"hit: {hit_frame_numbers}")
 
     ball_df = df[DF_BALL_PREFIX]
     delta_df = df.loc[:, (DF_GAME_PREFIX, 'delta')]

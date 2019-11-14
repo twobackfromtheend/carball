@@ -1,9 +1,12 @@
+import logging
 from typing import Dict
 
 import pandas as pd
 
 from api.analysis.hit_pb2 import Hit
 from carball.json_parser.game import Game as JsonParserGame
+
+logger = logging.getLogger(__name__)
 
 
 def set_goals(hits_by_goal_number: Dict[int, Hit], json_parser_game: JsonParserGame, df: pd.DataFrame):
@@ -23,10 +26,10 @@ def set_goals(hits_by_goal_number: Dict[int, Hit], json_parser_game: JsonParserG
                     last_hit_by_player = hit
         if goal_hit is None:
             if last_hit_by_player is not None:
-                print(f"Could not find shot for goal: {goal}. Using last hit by goalscorer...")
+                logger.warning(f"Could not find shot for goal: {goal}. "
+                               f"Using last hit by goalscorer (on frame {last_hit_by_player.frame_number}).")
                 goal_hit = last_hit_by_player
             else:
-                print(f"Could not find hit for goal: {goal}")
-
-            continue
+                logger.warning(f"Could not find hit for goal: {goal}")
+                continue
         goal_hit.goal = True

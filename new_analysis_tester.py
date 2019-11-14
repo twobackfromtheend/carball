@@ -3,7 +3,7 @@ from pathlib import Path
 
 from carball.analysis2.replay_analysis import analyse_replay
 
-logging.getLogger("carball").setLevel(logging.ERROR)
+logging.getLogger("carball.json_parser").setLevel(logging.ERROR)
 
 # replays_folder_path = Path(r"D:\Replays\Replays\RLCS Season 7")
 replays_folder_path = Path(r"C:\Users\harry\Documents\rocket_league\carball\test_replays")

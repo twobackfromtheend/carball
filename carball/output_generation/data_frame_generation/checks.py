@@ -1,13 +1,18 @@
+import logging
 from math import pi
 
 import numpy as np
 import pandas as pd
 
+from carball.output_generation.data_frame_generation.prefixes import DF_GAME_PREFIX, DF_BALL_PREFIX
+
+logger = logging.getLogger(__name__)
+
 
 def check_columns(df: pd.DataFrame):
     player_names = set(df.columns.levels[0].tolist())
-    player_names.remove('game__')
-    player_names.remove('ball__')
+    player_names.remove(DF_GAME_PREFIX)
+    player_names.remove(DF_BALL_PREFIX)
 
     required_player_columns = [
         'pos_x', 'pos_y', 'pos_z',
@@ -28,7 +33,7 @@ def check_columns(df: pd.DataFrame):
         try:
             assert len(missing_columns) == 0
         except AssertionError:
-            print(
+            logger.error(
                 f"Missing columns for {player_name}:",
                 missing_columns
             )
@@ -39,8 +44,8 @@ def check_columns(df: pd.DataFrame):
 def check_value_ranges(df: pd.DataFrame):
     # Check values are normalised properly
     player_names = set(df.columns.levels[0].tolist())
-    player_names.remove('game__')
-    player_names.remove('ball__')
+    player_names.remove(DF_GAME_PREFIX)
+    player_names.remove(DF_BALL_PREFIX)
 
     # Position
     pos_limits = [
@@ -53,7 +58,7 @@ def check_value_ranges(df: pd.DataFrame):
         try:
             assert ((limits[0] <= pos_df) & (pos_df <= limits[1])).all(axis=None)
         except AssertionError:
-            print(
+            logger.error(
                 f"Assertion failed: {pos_name}\n"
                 f"\tLimits: {limits}\n"
                 f"\tRange: \n{pos_df.min()}, \n{pos_df.max()}\n"
@@ -75,7 +80,7 @@ def check_value_ranges(df: pd.DataFrame):
         player_speed = (player_vel_df ** 2).sum(axis=1) ** 0.5
         assert (player_speed <= 2300 + 1e-3).all()  # 2300 technically the limit, account for rounding errors
 
-    ball_vel_df = df.loc[:, ('ball__', ['vel_x', 'vel_y', 'vel_z'])].fillna(0)
+    ball_vel_df = df.loc[:, (DF_BALL_PREFIX, ['vel_x', 'vel_y', 'vel_z'])].fillna(0)
     ball_speed = (ball_vel_df ** 2).sum(axis=1) ** 0.5
     assert (ball_speed <= 6000 + 1e-3).all()
 
@@ -87,7 +92,7 @@ def check_value_ranges(df: pd.DataFrame):
         ang_speed = (ang_vel_df ** 2).sum(axis=1) ** 0.5
         assert (ang_speed < 5.5 + 1e-3).all()
 
-    ball_ang_vel_df = df.loc[:, ('ball__', ['ang_vel_x', 'ang_vel_y', 'ang_vel_z'])].fillna(0)
+    ball_ang_vel_df = df.loc[:, (DF_BALL_PREFIX, ['ang_vel_x', 'ang_vel_y', 'ang_vel_z'])].fillna(0)
     assert ((-6 <= ball_ang_vel_df) & (ball_ang_vel_df <= 6)).all(axis=None)
     ball_ang_speed = (ball_ang_vel_df ** 2).sum(axis=1) ** 0.5
     assert (ball_ang_speed < 6 + 1e-3).all()

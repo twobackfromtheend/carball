@@ -14,9 +14,7 @@ _HANDLERS = [
     DoubleJumpHandler,
     BoostHandler,
     BoostPickupHandler,
-    CameraSettingsHandler,
-    RumbleItemHandler,
-    PlatformHandler
+    CameraSettingsHandler
 ]
 
 _PRIORITY_HANDLERS = [
