@@ -61,7 +61,10 @@ def set_dtypes(df: pd.DataFrame):
 
     for column in df.columns:
         second_level_index = column[1]
-        new_dtype = DTYPES[second_level_index]
+        try:
+            new_dtype = DTYPES[second_level_index]
+        except KeyError:
+            raise KeyError(f"Unknown column: {new_dtype}")
         try:
             if new_dtype == 'UInt8':
                 # Handle conversion of nullable booleans to int

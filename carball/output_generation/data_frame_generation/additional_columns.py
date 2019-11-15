@@ -1,9 +1,40 @@
+import logging
+
 import numpy as np
 import pandas as pd
 
 from carball.json_parser.game import Game as JsonParserGame
 from carball.output_generation.data_frame_generation.prefixes import DF_GAME_PREFIX
 from carball.output_generation.field_constants import get_boost_collect_is_big_boost
+
+BOOST_PER_SECOND = 80 * 1 / .93  * 100 / 255  # boost used per second out of 100
+
+logger = logging.getLogger(__name__)
+
+
+def add_boost_to_df(df: pd.DataFrame, json_parser_game: JsonParserGame):
+    player_names = [player.name for player in json_parser_game.players]
+
+    for player_name in player_names:
+        boost_temp_series = df[(player_name, 'boost_temp')]
+        updated_boost_values = boost_temp_series[boost_temp_series.diff() != 0]
+        frame_deltas = df[(DF_GAME_PREFIX, 'delta')]
+        df[(player_name, 'boost')] = updated_boost_values
+        boost_dict = updated_boost_values.to_dict()
+
+        boost_active = df[(player_name, 'boost_active')].to_dict()
+        for boost_tuple in boost_active.items():
+            frame_number, boost_is_active = boost_tuple
+            previous_frame_boost = boost_dict.get(frame_number - 1, np.nan)
+
+            if frame_number not in boost_dict:
+                boost_active_on_frame = boost_active.get(frame_number, False)
+                if boost_active_on_frame:
+                    frame_delta = frame_deltas.loc[frame_number]
+                    boost_dict[frame_number] = max(0, previous_frame_boost - frame_delta * BOOST_PER_SECOND)
+                else:
+                    boost_dict[frame_number] = previous_frame_boost
+        df[(player_name, 'boost')] = pd.Series(boost_dict).sort_index()
 
 
 def add_boost_collect_to_df(df: pd.DataFrame, json_parser_game: JsonParserGame):
@@ -26,7 +57,11 @@ def add_boost_collect_to_df(df: pd.DataFrame, json_parser_game: JsonParserGame):
             previous_frame_boost_active = df.loc[frame_number - 1, (player_name, 'boost_active')]
             if (current_frame_boost > previous_frame_boost) or \
                     (current_frame_boost == 100 and previous_frame_boost == 100 and previous_frame_boost_active):
-                boost_collect_is_big_boost = get_boost_collect_is_big_boost(player_position, boost_pad_id)
+                try:
+                    boost_collect_is_big_boost = get_boost_collect_is_big_boost(player_position, boost_pad_id)
+                except ValueError as e:
+                    logger.warning(f"Boost error for player {player_name} on frame {frame_number}: {e}")
+                    continue
                 df.loc[frame_number, (player_name, 'boost_collect')] = boost_collect_is_big_boost
             else:
                 # Ghost pickup

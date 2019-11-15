@@ -3,7 +3,6 @@ from typing import Optional
 
 from .base import *
 
-BOOST_PER_SECOND = 80 * 1 / .93  # boost used per second out of 255
 REPLICATED_PICKUP_KEY = 'TAGame.VehiclePickup_TA:ReplicatedPickupData'
 REPLICATED_PICKUP_KEY_168 = 'TAGame.VehiclePickup_TA:NewReplicatedPickupData'
 
@@ -11,12 +10,10 @@ REPLICATED_PICKUP_KEY_168 = 'TAGame.VehiclePickup_TA:NewReplicatedPickupData'
 def get_boost_actor_data(actor: dict) -> Optional[dict]:
     if REPLICATED_PICKUP_KEY in actor:
         replicated_pickup_data_actor = actor[REPLICATED_PICKUP_KEY]
-        if replicated_pickup_data_actor:
-            pickup_actor = replicated_pickup_data_actor['pickup']
+        pickup_actor = replicated_pickup_data_actor['pickup']
     elif REPLICATED_PICKUP_KEY_168 in actor:
         replicated_pickup_data_actor = actor[REPLICATED_PICKUP_KEY_168]
-        if replicated_pickup_data_actor:
-            pickup_actor = replicated_pickup_data_actor['pickup_new']
+        pickup_actor = replicated_pickup_data_actor['pickup_new']
     else:
         return
 
@@ -39,28 +36,21 @@ class BoostHandler(BaseActorHandler):
             actor.get(COMPONENT_REPLICATED_ACTIVE_KEY, False))
         # boost_is_active when random_int is odd?!
         boost_is_active = (boost_is_active_random_int % 2 == 1)
-        if boost_is_active:
-            # manually decrease car boost amount (not shown in replay)
-            # i assume game calculates the decrease itself similarly
-            boost_amount = max(0, actor.get('TAGame.CarComponent_Boost_TA:ReplicatedBoostAmount',
-                                            0) - delta * BOOST_PER_SECOND)
-            actor['TAGame.CarComponent_Boost_TA:ReplicatedBoostAmount'] = boost_amount
-        else:
-            boost_amount = actor.get('TAGame.CarComponent_Boost_TA:ReplicatedBoostAmount', None)
+        boost_amount = actor.get('TAGame.CarComponent_Boost_TA:ReplicatedBoostAmount', None)
 
         actor_frame = self.parser.player_data[player_actor_id][frame_number]
-        actor_frame['boost'] = boost_amount / 255 * 100 if boost_amount is not None else None
+        actor_frame['boost_temp'] = boost_amount / 255 * 100 if boost_amount is not None else None
         actor_frame['boost_active'] = boost_is_active
 
 
 class BoostPickupHandler(BaseActorHandler):
-
     @classmethod
     def can_handle(cls, actor: dict) -> bool:
         return actor['ClassName'] == 'TAGame.VehiclePickup_Boost_TA'
 
     def update(self, actor: dict, frame_number: int, time: float, delta: float) -> None:
         pickup_actor = get_boost_actor_data(actor)
+
         if pickup_actor is not None:
             car_actor_id = pickup_actor['instigator_id']
             if car_actor_id in self.parser.car_player_ids:
@@ -75,3 +65,4 @@ class BoostPickupHandler(BaseActorHandler):
                 # it does not turn back false immediately although boost is only collected once.
                 # using actor_id!=-1
                 pickup_actor["instigator_id"] = -1
+
