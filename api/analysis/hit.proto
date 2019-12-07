@@ -22,4 +22,7 @@ message Hit {
     bool passed = 16;
     bool dribble = 17;
     bool dribble_continuation = 18;
+
+    bool aerial = 19;
+    bool wall_hit = 20;
 }

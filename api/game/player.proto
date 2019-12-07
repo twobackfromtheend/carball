@@ -20,6 +20,4 @@ message Player {
     bool is_orange = 11;
     PlayerId party_leader = 12;
     bool is_bot = 13;
-    float time_in_game = 14;
-    uint32 first_frame_in_game = 15;
 }

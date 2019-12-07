@@ -21,7 +21,7 @@ def add_players(json_parser_game: JsonParserGame, game: Game):
             player.party_leader.id = json_parser_player.party_leader
 
         attributes = [
-            'name', 'title', 'score', 'goals', 'assists', 'saves', 'shots', 'is_bot'
+            'name', 'title', 'score', 'goals', 'assists', 'saves', 'shots', 'is_bot', 'is_orange'
         ]
         for attribute in attributes:
             json_parser_value = getattr(json_parser_player, attribute, None)

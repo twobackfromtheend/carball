@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package api.analysis;
+import "api/game/player_id.proto";
+
+
+message PlayerStats {
+    api.game.PlayerId id = 1;
+    HitCounts hit_counts = 2;
+
+    float time_in_game = 11;
+
+    // Boost
+    uint32 big_pads_collected = 101;
+    uint32 small_pads_collected = 102;
+    uint32 stolen_boosts = 103;
+    float boost_used = 104;
+    float time_full_boost = 105;
+    float time_high_boost = 106;
+    float time_low_boost = 107;
+    float time_no_boost = 108;
+    float average_boost_level = 109;
+
+    // Movement
+    float distance_travelled = 201;
+    float average_speed = 202;
+    float time_at_supersonic = 203;
+    float time_at_boost_speed = 204;
+    float time_at_slow_speed = 205;
+
+    // Positioning
+    float time_high_in_air = 301;
+    float time_in_air = 302;
+    float time_on_ground = 303;
+    float time_in_attacking_half = 304;
+    float time_in_defending_half = 305;
+    float time_in_attacking_third = 306;
+    float time_in_neutral_third = 307;
+    float time_in_defending_third = 308;
+    float time_most_forward = 309;
+    float time_between_players = 310;
+    float time_most_back = 311;
+
+    // Possession
+    float possession_duration = 401;
+
+    // Others
+    uint32 demos = 501;
+    uint32 demoed = 502;
+}
+
+message HitCounts {
+    // counts the number of hits of each type
+    uint32 hit = 1;
+    uint32 goal = 2;
+    uint32 assist = 3;
+    uint32 save = 4;
+    uint32 shot = 5;
+    uint32 secondary_assist = 6;
+    uint32 pass_ = 7;
+    uint32 passed = 8;
+    uint32 dribble = 9;
+    uint32 dribble_continuation = 10;
+    uint32 aerial = 11;
+    uint32 wall_hit = 12;
+}

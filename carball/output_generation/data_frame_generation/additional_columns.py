@@ -7,7 +7,7 @@ from carball.json_parser.game import Game as JsonParserGame
 from carball.output_generation.data_frame_generation.prefixes import DF_GAME_PREFIX
 from carball.output_generation.field_constants import get_boost_collect_is_big_boost
 
-BOOST_PER_SECOND = 80 * 1 / .93  * 100 / 255  # boost used per second out of 100
+BOOST_PER_SECOND = 80 * 1 / .93 * 100 / 255  # boost used per second out of 100
 
 logger = logging.getLogger(__name__)
 

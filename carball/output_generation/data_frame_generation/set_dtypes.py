@@ -27,7 +27,7 @@ DTYPES = {
     'handbrake': 'UInt8',  # Nullable boolean
     'ball_cam': 'UInt8',  # Nullable boolean
     'boost_active': 'UInt8',  # Nullable boolean
-    'boost_collect': 'UInt8',  # Nullable boolean
+    'boost_collect': 'UInt8',  # Nullable boolean (True for big boost)
     'jump_active': 'UInt16',  # Incremental counter (True when odd)
     'double_jump_active': 'UInt16',  # Incremental counter (True when odd)
     'dodge_active': 'UInt16',  # Incremental counter (True when odd)

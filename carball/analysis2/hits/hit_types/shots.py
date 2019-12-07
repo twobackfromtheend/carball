@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 
 from api.analysis.hit_pb2 import Hit
+from carball.analysis2.constants.constants import FIELD_Y_LIM
 from carball.json_parser.game import Game as JsonParserGame
 from carball.output_generation.data_frame_generation.prefixes import DF_BALL_PREFIX
 from rlutilities.simulation import Game, Ball
@@ -42,7 +43,7 @@ def set_shots(hits_by_goal_number: Dict[int, Hit], json_parser_game: JsonParserG
                 delta_simulated += dt
 
                 ball_y = ball.location[1]
-                if ball_y * direction_factor > 5120:
+                if ball_y * direction_factor > FIELD_Y_LIM:
                     hit.shot = True
                     break
 

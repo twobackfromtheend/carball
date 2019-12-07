@@ -22,8 +22,9 @@ def set_goals(hits_by_goal_number: Dict[int, Hit], json_parser_game: JsonParserG
                 if hit.shot:
                     goal_hit = hit
                     break
-                if last_hit_by_player is None:
+                else:
                     last_hit_by_player = hit
+                    break
         if goal_hit is None:
             if last_hit_by_player is not None:
                 logger.warning(f"Could not find shot for goal: {goal}. "
