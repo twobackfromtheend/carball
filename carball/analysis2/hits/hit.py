@@ -62,11 +62,13 @@ def get_hits(events: Events, json_parser_game: JsonParserGame, df: pd.DataFrame)
 
     previous_hit = None
     for frame_number, player_name in hits_data.name.iteritems():
+        goal_number = goal_numbers[frame_number]
+        if np.isnan(goal_number):
+            continue
         hit = events.hits.add()
         hit.frame_number = frame_number
         hit.player_id.id = player_name_to_id[player_name]
-        hit.goal_number = goal_numbers[frame_number]
-
+        hit.goal_number = goal_number
         if previous_hit is not None:
             if previous_hit.goal_number == hit.goal_number:
                 previous_hit.next_hit_frame_number = frame_number
