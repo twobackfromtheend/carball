@@ -79,7 +79,7 @@ SMALL_BOOSTS_ARRAY = np.array(list(SMALL_BOOSTS.values()))
 
 
 def get_boost_collect_is_big_boost(position: np.array, boost_pad_id: int) -> bool:
-    HORIZONTAL_BUFFER = 160
+    HORIZONTAL_BUFFER = 180
     VERTICAL_BUFFER = 100
 
     position_xy = position[:2]
@@ -91,16 +91,16 @@ def get_boost_collect_is_big_boost(position: np.array, boost_pad_id: int) -> boo
         horizontal_distance = big_boost_distances.min()
         vertical_distance = position[2]
         if horizontal_distance > BIG_BOOST_RADIUS + HORIZONTAL_BUFFER:
-            raise ValueError(f"Boost collection happens too far from boost pad: {horizontal_distance:.0f}uu (H).")
+            raise ValueError(f"Boost collection happens too far from big boost pad: {horizontal_distance:.0f}uu (H).")
         elif vertical_distance > BIG_BOOST_HEIGHT + VERTICAL_BUFFER:
-            raise ValueError(f"Boost collection happens too far from boost pad: {vertical_distance:.0f}uu (V).")
+            raise ValueError(f"Boost collection happens too far from big boost pad: {vertical_distance:.0f}uu (V).")
         return True
     else:
         # Small boost
         horizontal_distance = small_boost_distances.min()
         vertical_distance = position[2]
         if horizontal_distance > SMALL_BOOST_RADIUS + HORIZONTAL_BUFFER:
-            raise ValueError(f"Boost collection happens too far from boost pad: {horizontal_distance:.0f}uu (H).")
+            raise ValueError(f"Boost collection happens too far from small boost pad: {horizontal_distance:.0f}uu (H).")
         elif vertical_distance > SMALL_BOOST_HEIGHT + VERTICAL_BUFFER:
-            raise ValueError(f"Boost collection happens too far from boost pad: {vertical_distance:.0f}uu (V).")
+            raise ValueError(f"Boost collection happens too far from small boost pad: {vertical_distance:.0f}uu (V).")
         return False
