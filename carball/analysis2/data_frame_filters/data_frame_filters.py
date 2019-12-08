@@ -54,6 +54,6 @@ def get_high_in_air(data_frame: pd.DataFrame, buffer: float = 100):
 
 
 def get_near_surface(data_frame: pd.DataFrame, buffer: float = 100):
-    return (data_frame.pos_z > 150) \
-           & (np.abs(data_frame.pos_x) > FIELD_X_LIM - buffer) \
-           & (np.abs(data_frame.pos_y) > FIELD_Y_LIM - buffer)
+    return (data_frame.pos_z < 150) \
+           | ((np.abs(data_frame.pos_x) > FIELD_X_LIM - buffer)
+              & (np.abs(data_frame.pos_y) > FIELD_Y_LIM - buffer))
