@@ -47,7 +47,7 @@ DTYPES = {
     'team_0_score': 'Int8',
     'team_1_score': 'Int8',
 
-    'goal_number': 'UInt8',
+    'goal_number': 'Int8',
     # 0-(N-1) for N goals scored, -1 after last kickoff if no goal at the end, nan before first touches
 
     'is_demolished': 'bool'  # Boolean
