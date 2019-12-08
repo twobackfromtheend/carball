@@ -36,13 +36,14 @@ def set_positioning_stats(player_stats: Dict[str, PlayerStats], player_blue_data
         player_names = player_names_by_team[team_is_orange]
         first_player_id = player_name_to_id[player_names[0]]
         blue_df = player_blue_data_frames[first_player_id]
-        pos_y_rank = blue_df.loc[:, (player_names_by_team[0], 'pos_y')].rank(axis=1)
+        pos_y_rank = blue_df.loc[:, (player_names, 'pos_y')].rank(axis=1)
 
         for player_name in player_names:
             player_id = player_name_to_id[player_name]
             _player_stats = player_stats[player_id]
-            _player_stats.time_most_back = sum_delta(blue_df.loc[pos_y_rank[player_name, 'pos_y'] == 1])
-            _player_stats.time_between_players = sum_delta(blue_df.loc[pos_y_rank[player_name, 'pos_y'] == 2])
-            _player_stats.time_most_forward = sum_delta(blue_df.loc[pos_y_rank[player_name, 'pos_y'] == 3])
-            # print(player_name)
-            # print(_player_stats)
+            most_back = pos_y_rank.loc[:, (player_name, 'pos_y')] == 1
+            between_players = pos_y_rank.loc[:, (player_name, 'pos_y')] == 2
+            most_forward = pos_y_rank.loc[:, (player_name, 'pos_y')] == 3
+            _player_stats.time_most_back = sum_delta(blue_df.loc[most_back])
+            _player_stats.time_between_players = sum_delta(blue_df.loc[between_players])
+            _player_stats.time_most_forward = sum_delta(blue_df.loc[most_forward])
