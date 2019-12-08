@@ -44,9 +44,11 @@ message PlayerStats {
     // Possession
     float possession_duration = 401;
 
-    // Others
+    // Demos
     uint32 demos = 501;
     uint32 demoed = 502;
+    uint32 demos_near_opponent_goal = 503;
+    uint32 demoed_near_own_goal = 504;
 }
 
 message HitCounts {

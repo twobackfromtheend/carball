@@ -6,14 +6,14 @@ import pandas as pd
 from rlutilities.linear_algebra import vec3
 from rlutilities.simulation import Game, Ball
 
-from api.analysis.hit_pb2 import Hit
+from api.events.events_pb2 import Events
 from carball.json_parser.game import Game as JsonParserGame
 from carball.output_generation.data_frame_generation.prefixes import DF_GAME_PREFIX, DF_BALL_PREFIX
 
 logger = logging.getLogger(__name__)
 
 
-def get_hits(json_parser_game: JsonParserGame, df: pd.DataFrame) -> List[Hit]:
+def get_hits(events: Events, json_parser_game: JsonParserGame, df: pd.DataFrame):
     hit_frame_numbers = get_hit_frame_numbers(df)
     player_names = [player.name for player in json_parser_game.players]
     hit_frames_df = df.loc[hit_frame_numbers, :]
@@ -60,10 +60,9 @@ def get_hits(json_parser_game: JsonParserGame, df: pd.DataFrame) -> List[Hit]:
     player_name_to_id: Dict[str, str] = {player.name: player.online_id for player in json_parser_game.players}
     goal_numbers = df.loc[hits_data.index, (DF_GAME_PREFIX, 'goal_number')].to_dict()
 
-    hits = []
     previous_hit = None
     for frame_number, player_name in hits_data.name.iteritems():
-        hit = Hit()
+        hit = events.hits.add()
         hit.frame_number = frame_number
         hit.player_id.id = player_name_to_id[player_name]
         hit.goal_number = goal_numbers[frame_number]
@@ -72,18 +71,18 @@ def get_hits(json_parser_game: JsonParserGame, df: pd.DataFrame) -> List[Hit]:
             if previous_hit.goal_number == hit.goal_number:
                 previous_hit.next_hit_frame_number = frame_number
                 hit.previous_hit_frame_number = previous_hit.frame_number
-
-        hits.append(hit)
         previous_hit = hit
-
-    return hits
 
 
 def get_hit_frame_numbers(df: pd.DataFrame):
+    ball_df = df[DF_BALL_PREFIX]
+
     hit_frame_numbers = get_hit_frame_numbers_by_ball_ang_vel(df)
+    # Filter by hit_team_no
+    hit_frame_numbers = ball_df.loc[hit_frame_numbers].index[
+        ~ball_df.loc[hit_frame_numbers, "hit_team_no"].isna()].tolist()
     logger.info(f"hit: {hit_frame_numbers}")
 
-    ball_df = df[DF_BALL_PREFIX]
     delta_df = df.loc[:, (DF_GAME_PREFIX, 'delta')]
     Game.set_mode("soccar")
     filtered_hit_frame_numbers = []
@@ -123,6 +122,6 @@ def get_hit_frame_numbers(df: pd.DataFrame):
 
 def get_hit_frame_numbers_by_ball_ang_vel(data_frame: pd.DataFrame) -> List[int]:
     ball_ang_vels = data_frame.loc[:, (DF_BALL_PREFIX, ['ang_vel_x', 'ang_vel_y', 'ang_vel_z'])]
-    diff_series = ball_ang_vels.diff().any(axis=1)
+    diff_series = ball_ang_vels.diff().any(axis=1)  # Does not include where changing to or from NaN
     indices = diff_series.index[diff_series].tolist()
     return indices

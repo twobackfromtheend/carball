@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+import "api/events/hit.proto";
+
+package api.events;
+
+message Events {
+    repeated Hit hits = 2;
+}
