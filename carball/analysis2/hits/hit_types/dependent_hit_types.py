@@ -38,11 +38,12 @@ def set_hit_type_dependent_on_previous_hit(hits_by_goal_number: Dict[int, Hit], 
                         previous_hit.assist = True
 
                         # Secondary assists
-                        previous_previous_hit_player_id = previous_previous_hit.player_id.id
-                        if previous_previous_hit_player_id != previous_hit_player_id and \
-                                player_id_to_team[previous_previous_hit_player_id] == player_id_to_team[
-                            previous_hit_player_id]:
-                            previous_previous_hit.secondary_assist = True
+                        if previous_previous_hit is not None:
+                            previous_previous_hit_player_id = previous_previous_hit.player_id.id
+                            if previous_previous_hit_player_id != previous_hit_player_id and \
+                                    player_id_to_team[previous_previous_hit_player_id] == player_id_to_team[
+                                previous_hit_player_id]:
+                                previous_previous_hit.secondary_assist = True
                 else:
                     # Saves
                     if previous_hit.shot and not previous_hit.goal:
