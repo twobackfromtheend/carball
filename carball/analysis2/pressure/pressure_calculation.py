@@ -38,4 +38,3 @@ def calculate_pressures(hits: List[Hit], json_parser_game: JsonParserGame, df: p
 
     _df['pressures'] = pd.Series(pressures, dtype='Int8')
 
-    print("hi")
