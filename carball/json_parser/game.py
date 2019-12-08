@@ -192,16 +192,15 @@ class Game:
                     break
             if found_player is None:
                 # player not in endgame stats, create new player
-                try:
-                    found_player = Player().create_from_actor_data(_player_data, self.teams)
-                except KeyError as e:
-                    # KeyError: 'Engine.PlayerReplicationInfo:Team'
-                    # in `team_actor_id = actor_data["Engine.PlayerReplicationInfo:Team"]`
+                if "Engine.PlayerReplicationInfo:Team" not in _player_data:
                     # Player never actually joins the game.
-                    if 'Engine.PlayerReplicationInfo:Team' not in _player_data:
-                        logger.warning(f"Ignoring player: {_player_data['name']} as player has no team.")
-                        continue
-                    raise e
+                    logger.warning(f"Ignoring player: {_player_data['name']} as player has no team.")
+                    continue
+                elif "TAGame.PRI_TA:MatchScore"not in _player_data:
+                    logger.warning(f"Ignoring player: {_player_data['name']} as player has no score.")
+                    continue
+
+                found_player = Player().create_from_actor_data(_player_data, self.teams)
                 self.players.append(found_player)
                 player_actor_id_player_dict[_player_actor_id] = found_player
 
