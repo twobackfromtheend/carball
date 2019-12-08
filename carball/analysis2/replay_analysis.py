@@ -1,5 +1,6 @@
 import logging
 
+from api.events.events_pb2 import Events
 from carball.analysis2.hits.hit import get_hits
 from carball.analysis2.hits.hit_types.hit_type_calculation import calculate_hit_types
 from carball.analysis2.pressure.pressure_calculation import calculate_pressures
@@ -29,19 +30,22 @@ def analyse_replay(replay: str):
         df = create_data_frame(json_parser_game)
     # print(df.memory_usage())
 
+    events = Events()
     # with timer('Getting old hits'):
     #     # old hits
     #     old_hit_frames = BaseHit.get_hits_from_game(json_parser_game, None, None, df, None)
 
     with timer('Getting hits'):
         # new hits
-        hits = get_hits(json_parser_game, df)
+        get_hits(events, json_parser_game, df)
 
     with timer('Calculating hit types'):
-        calculate_hit_types(hits, json_parser_game, df)
+        calculate_hit_types(events.hits, json_parser_game, df)
 
     with timer('Calculating pressures'):
-        calculate_pressures(hits, json_parser_game, df)
+        calculate_pressures(events.hits, json_parser_game, df)
 
     with timer("Calculating stats"):
-        calculate_stats(hits, game, df)
+        analysis = calculate_stats(events, game, df)
+
+    return json_parser_game, game, df, events, analysis
