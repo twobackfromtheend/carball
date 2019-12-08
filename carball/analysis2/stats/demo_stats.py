@@ -20,9 +20,6 @@ def set_demo_stats(player_stats: Dict[str, PlayerStats], game: Game, player_blue
 
     for demo in game.game_metadata.demos:
         frame_number = demo.frame_number
-        # demo_goal_number = goal_number[frame_number]
-        # if np.isnan(demo_goal_number):
-        #     continue
         if frame_number not in active_frames:
             continue
         attacker_id = demo.attacker_id.id
@@ -45,3 +42,5 @@ def set_demo_stats(player_stats: Dict[str, PlayerStats], game: Game, player_blue
     for player_id, _player_stats in player_stats.items():
         _player_stats.demos = demo_counts[player_id]
         _player_stats.demoed = demoed_counts[player_id]
+        _player_stats.demos_near_opponent_goal = demos_near_opponent_goal_counts[player_id]
+        _player_stats.demoed_near_own_goal = demoed_near_own_goal_counts[player_id]
