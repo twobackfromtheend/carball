@@ -78,7 +78,7 @@ def check_value_ranges(df: pd.DataFrame):
     for player_name in player_names:
         player_vel_df = df.loc[:, (player_name, ['vel_x', 'vel_y', 'vel_z'])].fillna(0)
         player_speed = (player_vel_df ** 2).sum(axis=1) ** 0.5
-        assert (player_speed <= 2300 + 1e-3).all()  # 2300 technically the limit, account for rounding errors
+        assert (player_speed <= 2300 + 1e-2).all()  # 2300 technically the limit, account for rounding errors
 
     ball_vel_df = df.loc[:, (DF_BALL_PREFIX, ['vel_x', 'vel_y', 'vel_z'])].fillna(0)
     ball_speed = (ball_vel_df ** 2).sum(axis=1) ** 0.5

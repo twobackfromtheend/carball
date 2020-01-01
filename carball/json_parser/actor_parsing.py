@@ -104,9 +104,19 @@ def rescale_to_uu(data_dict: dict) -> dict:
 def convert_to_radians(data_dict: dict) -> dict:
     # converts from int16 to radians
     try:
-        data_dict['rot_x'] *= -2 * math.pi / 65535
-        data_dict['rot_y'] = (data_dict['rot_y'] / 65535 - 0.5) * 2 * math.pi
-        data_dict['rot_z'] *= -2 * math.pi / 65535
+        data_dict['rot_x'] = (data_dict['rot_x'] / 65535) * math.pi
+        if data_dict['rot_x'] > math.pi / 2:
+            data_dict['rot_x'] -= math.pi
+        data_dict['rot_x'] *= -1
+        data_dict['rot_y'] = (data_dict['rot_y'] / 65535) * 2 * math.pi
+        if data_dict['rot_y'] > math.pi:
+            data_dict['rot_y'] -= 2 * math.pi
+        data_dict['rot_z'] = (data_dict['rot_z'] / 65535) * 2 * math.pi
+        if data_dict['rot_z'] > math.pi:
+            data_dict['rot_z'] -= 2 * math.pi
+        # data_dict['rot_x'] *= -2 * math.pi / 65535 - 0.5
+        # data_dict['rot_y'] = (data_dict['rot_y'] / 65535 - 0.5) * 2 * math.pi
+        # data_dict['rot_z'] *= -2 * math.pi / 65535
     except TypeError:
         pass
     return data_dict
