@@ -74,8 +74,8 @@ def get_data_dict_from_pairs(actor_data: dict, pairs: dict) -> dict:
 
 
 def standardise_data_dict(data_dict: dict, version: int = None) -> dict:
-    if version is not None and version >= 7:
-        data_dict = rescale_to_uu(data_dict)
+    if version is not None:
+        data_dict = rescale_to_uu(data_dict, version)
     if data_dict['quat_w'] is None:
         data_dict = convert_to_radians(data_dict)
     if version is not None and version >= 7 and data_dict['quat_w'] is not None:
@@ -87,12 +87,22 @@ def standardise_data_dict(data_dict: dict, version: int = None) -> dict:
     return data_dict
 
 
-def rescale_to_uu(data_dict: dict) -> dict:
-    # handle psyonix's rounding to 2dp (and storing 1.00 as 100)
-    correction_dict = {'pos_x': 100, 'pos_y': 100, 'pos_z': 100,
-                       'vel_x': 100, 'vel_y': 100, 'vel_z': 100,
-                       'ang_vel_x': 10000, 'ang_vel_y': 10000, 'ang_vel_z': 10000}
-    # /100 pos, /10 vel and ang_vel
+def rescale_to_uu(data_dict: dict, version: int) -> dict:
+    if 2 <= version <= 6:
+        correction_dict = {
+            'vel_x': 10, 'vel_y': 10, 'vel_z': 10,
+            'ang_vel_x': 1000, 'ang_vel_y': 1000, 'ang_vel_z': 1000
+        }
+    elif version >= 7:
+        # handle psyonix's rounding to 2dp (and storing 1.00 as 100)
+        correction_dict = {
+            'pos_x': 100, 'pos_y': 100, 'pos_z': 100,
+            'vel_x': 100, 'vel_y': 100, 'vel_z': 100,
+            'ang_vel_x': 10000, 'ang_vel_y': 10000, 'ang_vel_z': 10000
+        }
+        # /100 pos, /10 vel and ang_vel
+    else:
+        correction_dict = {}
     for _item, _divisor in correction_dict.items():
         try:
             data_dict[_item] /= _divisor
