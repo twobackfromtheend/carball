@@ -4,7 +4,7 @@ from typing import List, Counter, Dict
 import pandas as pd
 
 from api.analysis.analysis_pb2 import Analysis
-from api.analysis.hit_pb2 import Hit
+from api.events.hit_pb2 import Hit
 from api.analysis.stats_pb2 import PlayerStats
 from api.events.events_pb2 import Events
 from api.game.game_pb2 import Game

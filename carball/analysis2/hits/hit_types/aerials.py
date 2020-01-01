@@ -2,7 +2,7 @@ from typing import Dict
 
 import pandas as pd
 
-from api.analysis.hit_pb2 import Hit
+from api.events.hit_pb2 import Hit
 from carball.analysis2.data_frame_filters.data_frame_filters import get_high_in_air, get_near_surface
 from carball.json_parser.game import Game as JsonParserGame
 from carball.output_generation.data_frame_generation.prefixes import DF_BALL_PREFIX

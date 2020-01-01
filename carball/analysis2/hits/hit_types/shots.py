@@ -1,15 +1,13 @@
 from typing import Dict
 
-import numpy as np
 import pandas as pd
+from rlutilities.linear_algebra import vec3
+from rlutilities.simulation import Game, Ball
 
-from api.analysis.hit_pb2 import Hit
+from api.events.hit_pb2 import Hit
 from carball.analysis2.constants.constants import FIELD_Y_LIM
 from carball.json_parser.game import Game as JsonParserGame
 from carball.output_generation.data_frame_generation.prefixes import DF_BALL_PREFIX
-from rlutilities.simulation import Game, Ball
-
-from rlutilities.linear_algebra import vec3
 
 SHOT_SECONDS_SIMULATED = 5
 

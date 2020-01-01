@@ -3,7 +3,7 @@ from typing import Dict, List
 
 import pandas as pd
 
-from api.analysis.hit_pb2 import Hit
+from api.events.hit_pb2 import Hit
 from api.analysis.stats_pb2 import PlayerStats
 from carball.output_generation.data_frame_generation.prefixes import DF_GAME_PREFIX
 

@@ -2,7 +2,7 @@ from typing import Dict
 
 import pandas as pd
 
-from api.analysis.hit_pb2 import Hit
+from api.events.hit_pb2 import Hit
 from carball.json_parser.game import Game as JsonParserGame
 
 
