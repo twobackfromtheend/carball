@@ -124,6 +124,8 @@ def convert_to_radians(data_dict: dict) -> dict:
         data_dict['rot_z'] = (data_dict['rot_z'] / 65535) * 2 * math.pi
         if data_dict['rot_z'] > math.pi:
             data_dict['rot_z'] -= 2 * math.pi
+        data_dict['rot_z'] *= -1
+
         # data_dict['rot_x'] *= -2 * math.pi / 65535 - 0.5
         # data_dict['rot_y'] = (data_dict['rot_y'] / 65535 - 0.5) * 2 * math.pi
         # data_dict['rot_z'] *= -2 * math.pi / 65535
@@ -140,18 +142,18 @@ def convert_quat_to_rot(data_dict: dict) -> dict:
     y = data_dict['quat_y']
     z = data_dict['quat_z']
 
-    sinr = 2.0 * (w * x + y * z)
-    cosr = 1.0 - 2.0 * (x * x + y * y)
+    sinr = 2 * (w * x + y * z)
+    cosr = 1 - 2 * (x * x + y * y)
     roll = math.atan2(sinr, cosr)
 
-    sinp = 2.0 * (w * y - z * x)
+    sinp = 2 * (w * y - z * x)
     if abs(sinp) >= 1:
         pitch = math.copysign(math.pi / 2, sinp)
     else:
         pitch = math.asin(sinp)
 
-    siny = 2.0 * (w * z + x * y)
-    cosy = 1.0 - 2.0 * (y * y + z * z)
+    siny = 2 * (w * z + x * y)
+    cosy = 1 - 2 * (y * y + z * z)
     yaw = math.atan2(siny, cosy)
     data_dict['rot_x'] = pitch
     data_dict['rot_y'] = yaw
