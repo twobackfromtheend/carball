@@ -44,7 +44,6 @@ def set_metadata(json_parser_game: JsonParserGame, game: Game):
 
     set_game_score(json_parser_game, game)
     add_goals(json_parser_game, game)
-    add_demos(json_parser_game, game)
 
 
 def set_game_score(json_parser_game: JsonParserGame, game: Game):
@@ -63,11 +62,3 @@ def add_goals(json_parser_game: JsonParserGame, game: Game):
         goal.frame_number = json_parser_goal.frame_number
         goal.player_id.id = json_parser_goal.player.online_id
 
-
-def add_demos(json_parser_game: JsonParserGame, game: Game):
-    demos = game.game_metadata.demos
-    for json_parser_demo in json_parser_game.demos:
-        demo = demos.add()
-        demo.frame_number = json_parser_demo['frame_number']
-        demo.attacker_id.id = json_parser_demo['attacker'].online_id
-        demo.victim_id.id = json_parser_demo['victim'].online_id
