@@ -40,12 +40,6 @@ message Goal {
     api.game.PlayerId player_id = 2;
 }
 
-message Demo {
-    uint32 frame_number = 1;
-    api.game.PlayerId attacker_id = 2;
-    api.game.PlayerId victim_id = 3;
-}
-
 message GameMetadata {
     string id = 1;
     string name = 2;
@@ -55,7 +49,6 @@ message GameMetadata {
     uint32 frames = 6;
     GameScore score = 7;
     repeated Goal goals = 8;
-    repeated Demo demos = 9;
     api.game.PlayerId primary_player = 10;
     float duration = 11;
     string game_server_id = 12;

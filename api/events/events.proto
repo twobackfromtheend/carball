@@ -1,9 +1,13 @@
 syntax = "proto3";
 
+import "api/events/demo.proto";
 import "api/events/hit.proto";
+import "api/events/pressure.proto";
 
 package api.events;
 
 message Events {
+    repeated Demo demos = 1;
     repeated Hit hits = 2;
+    repeated Pressure pressures = 3;
 }

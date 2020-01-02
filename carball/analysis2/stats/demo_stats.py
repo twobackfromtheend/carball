@@ -18,7 +18,7 @@ def set_demo_stats(player_stats: Dict[str, PlayerStats], game: Game, player_blue
     demoed_near_own_goal_counts = Counter()
     active_frames = list(player_blue_data_frames.values())[0].index
 
-    for demo in game.game_metadata.demos:
+    for demo in game.events.demos:
         frame_number = demo.frame_number
         if frame_number not in active_frames:
             continue

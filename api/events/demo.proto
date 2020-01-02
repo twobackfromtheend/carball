@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+import "api/game/player_id.proto";
+
+package api.events;
+
+message Demo {
+    uint32 frame_number = 1;
+    api.game.PlayerId attacker_id = 2;
+    api.game.PlayerId victim_id = 3;
+}

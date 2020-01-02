@@ -4,6 +4,7 @@ import "api/game/metadata/game_metadata.proto";
 import "api/game/player.proto";
 import "api/game/team.proto";
 import "api/game/party.proto";
+import "api/events/events.proto";
 
 package api.game;
 
@@ -11,7 +12,9 @@ message Game {
     api.game.metadata.GameMetadata game_metadata = 1;
     repeated Player players = 2;
     repeated Team teams = 3;
-    repeated Party parties = 5;
+    repeated Party parties = 4;
     // Version info just a normal increasing number
-    uint32 version = 6;
+    uint32 version = 5;
+
+    api.events.Events events = 6;
 }

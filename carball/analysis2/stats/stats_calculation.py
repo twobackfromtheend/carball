@@ -15,6 +15,7 @@ from carball.analysis2.stats.movement_stats import set_movement_stats
 from carball.analysis2.stats.positioning_stats import set_positioning_stats
 from carball.analysis2.stats.possession_stats import set_possession_stats
 from carball.analysis2.timer import timer
+from carball.output_generation.data_frame_generation.prefixes import DF_GAME_PREFIX
 
 
 def calculate_stats(events: Events, game: Game, df: pd.DataFrame):
@@ -31,7 +32,7 @@ def calculate_stats(events: Events, game: Game, df: pd.DataFrame):
     with timer("\tCalculating hit counts"):
         set_hit_counts(hits, player_stats)
 
-    active_frames_df = df[~df.game__.goal_number.isna()]
+    active_frames_df = df[~df[(DF_GAME_PREFIX, 'goal_number')].isna()]
 
     player_blue_data_frames: Dict[str, pd.DataFrame] = {}
     flipped_df = get_flipped_data_frame(active_frames_df)

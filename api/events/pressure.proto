@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+import "api/game/player_id.proto";
+
+package api.events;
+
+message PlayerPressureStats {
+    uint32 hits = 1;
+    bool goal = 2;
+    bool assist = 3;
+    uint32 shots = 4;
+    uint32 saves = 5;
+
+    uint32 passes = 6;
+
+    float ball_hit_forward = 7;
+    float boost_used = 8;
+    float average_speed = 9;
+
+}
+
+message Pressure {
+    uint32 start_frame_number = 1;
+    uint32 end_frame_number = 2;
+
+    float duration = 3;
+    float time_since_last_possession = 4;
+
+    repeated PlayerPressureStats player_stats = 5;
+}
