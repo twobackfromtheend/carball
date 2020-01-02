@@ -43,8 +43,20 @@ def load_scene():
     scale_and_roll_objects(ball_scene, 1.1)
     scale_and_roll_objects(field_scene, 4)
 
-    scene_ = (ball_scene + field_scene + octane_blue_scene)
-    scene_.show()
+    # Yaw field by pi to swap blue and orange.
+    transformation_matrix = np.identity(4)
+    pitch = np.pi
+    transformation_matrix[:3, :3] = np.array(
+        [[cos(pitch), 0, sin(pitch)],
+         [0, 1, 0],
+         [-sin(pitch), 0, cos(pitch)]]
+    )
+    for name, trimesh_ in field_scene.geometry.items():
+        trimesh_.apply_transform(transformation_matrix)
+
+    # Preview objects using trimesh's render
+    # _scene = (ball_scene + field_scene + octane_blue_scene)
+    # _scene.show()
 
     def as_pyrender_mesh(trimesh_scene):
         meshes = []
@@ -69,6 +81,32 @@ def load_scene():
         else:
             return [scene.add(mesh) for mesh in octane_blue_meshes]
 
+    def add_camera(scene):
+        camera = pyrender.PerspectiveCamera(yfov=np.pi / 2)
+
+        # Mostly taken from Viewer._compute_initial_camera_pose
+        centroid = scene.centroid
+        scale = scene.scale
+        pose = np.identity(4)
+
+        s2 = 1 / 2 ** 0.5
+        pose_rotation = np.array([
+            [0, -s2, s2],
+            [1, 0, 0],
+            [0, s2, s2]
+        ])
+        pose[:3, :3] = pose_rotation
+
+        hfov = np.pi / 3
+        dist = scale / (2 * np.tan(hfov))
+        pose[:3, 3] = dist * np.array([1, 0, 1]) + centroid
+
+        # Taken from trackball.rotate
+        x_rot_mat = trimesh.transformations.rotation_matrix(3.1415926, [0, 0, 1], centroid)
+        pose = x_rot_mat @ pose
+        scene.add(camera, pose=pose)
+
+    add_camera(scene)
 
     nodes = {'ball': ball_nodes, 'players': [get_octane_nodes(i < 3) for i in range(6)]}
     return scene, nodes
@@ -92,7 +130,7 @@ def get_rotation_matrix(pitch, yaw, roll):
          [0, sin(roll), cos(roll)]]
     )
 
-    return R_pitch @ R_yaw @ R_roll
+    return R_yaw @ R_pitch @ R_roll
 
 
 def get_rotation_matrix_2(pitch, yaw, roll):
@@ -103,10 +141,20 @@ def get_rotation_matrix_2(pitch, yaw, roll):
     CR = cos(roll)
     SR = sin(roll)
 
+    # Chip's
+    # theta = np.array(
+    #     [[CP * CY, CY * SP * SR - CR * SY, -CR * CY * SP - SR * SY],
+    #      [CP * SY, SY * SP * SR + CR * CY, -CR * SY * SP + SR * CY],
+    #      [SP, -CP * SR, CP * CR]]
+    # )
+
+    # This agrees with get_rotation_matrix()
+    # Wiki's: https://en.wikipedia.org/wiki/Euler_angles#Rotation_matrix See Z1 Y2 X3
+    # negated cells [0, 2], [1, 2], [2, 0], [2, 1]
     theta = np.array(
-        [[CP * CY, CY * SP * SR - CR * SY, -CR * CY * SP - SR * SY],
-         [CP * SY, SY * SP * SR + CR * CY, -CR * SY * SP + SR * CY],
-         [SP, -CP * SR, CP * CR]]
+        [[CP * CY, CY * SP * SR - CR * SY, CR * CY * SP + SR * SY],
+         [CP * SY, SY * SP * SR + CR * CY, CR * SY * SP - SR * CY],
+         [-SP, CP * SR, CP * CR]]
     )
     return theta
 
@@ -114,10 +162,13 @@ def get_rotation_matrix_2(pitch, yaw, roll):
 def get_transformation_matrix_from_frame(frame: pd.Series):
     pose = np.identity(4)
     positions = frame.loc[['pos_x', 'pos_y', 'pos_z']].values
-    positions[1] = -positions[1]  # y = -y to change LH axes to RH
+    # positions[1] = -positions[1]  # y = -y to change LH axes to RH
+    # positions[0] = -positions[0]  # x = -x to change LH axes to RH
     positions /= 100
     pose[:3, -1] = positions
-    pose[:3, :3] = get_rotation_matrix_2(*-frame.loc[['rot_x', 'rot_y', 'rot_z']].values)
+    pose[:3, :3] = get_rotation_matrix(*frame.loc[['rot_x', 'rot_y', 'rot_z']].values)
+    # pose[:3, :3] = get_rotation_matrix(*-frame.loc[['rot_x', 'rot_y', 'rot_z']].values)
+    # pose[:3, :3] = get_rotation_matrix_2(*-frame.loc[['rot_x', 'rot_y', 'rot_z']].values)
     # print(pose)
     return pose
 
@@ -143,14 +194,17 @@ def event_loop():
     game_time_series = df[(DF_GAME_PREFIX, 'delta')].cumsum()
     start_time = time.time()
     previous_frame = -1
+    i = 0
     while v.is_active:
-        time.sleep(0.016)
-        current_time = time.time() - start_time
+        # time.sleep(0.016)
+        # current_time = time.time() - start_time
+        current_time = i * 1 / 30
         try:
             current_frame = game_time_series[game_time_series <= current_time].idxmax()
         except ValueError:
             current_frame = game_time_series.index.min()
 
+        i += 1
         if current_frame == previous_frame:
             continue
         previous_frame = current_frame
@@ -192,14 +246,12 @@ if __name__ == '__main__':
 
     # V4
     # replay = r"D:\Replays\Replays\RLCS Season 2\2 - League Play\NA\Week 4\RLCS S2 - Week 4 - VindicatorGG v Take 3 - Game 2.replay"
-    # replay = r"D:\Replays\Replays\RLCS Season 2\2 - League Play\NA\Week 1\RLCS S2 - Week 1 - Exodus v Deception - Game 2.replay"
+    replay = r"D:\Replays\Replays\RLCS Season 2\2 - League Play\NA\Week 1\RLCS S2 - Week 1 - Exodus v Deception - Game 2.replay"
 
     # V2
     # replay = r"D:\Replays\Replays\RLCS Season 1\1 - Q2 Group Stage\NA\1B - Exodus vs Lucky Bounce - Game 2.replay"
     # replay = r"D:\Replays\Replays\RLCS Season 1\1 - Q2 Group Stage\NA\6B - Mock-It eSports NA vs Kings of Urban - Game 2.replay"
-    replay = r"D:\Replays\Replays\RLCS Season 1\3 - Live Finals\Day 2\RLCS S1 Finals - Match 9 - The Flying Dutchmen vs Genesis - Game 1.replay"
-
-
+    # replay = r"D:\Replays\Replays\RLCS Season 1\3 - Live Finals\Day 2\RLCS S1 Finals - Match 9 - The Flying Dutchmen vs Genesis - Game 1.replay"
 
     json_parser_game, game, df, events, analysis = analyse_replay(str(replay))
 
@@ -212,10 +264,18 @@ if __name__ == '__main__':
 
     scene, nodes = load_scene()
 
-    # NOTE: Pyrender's run_in_thread does not work on Windows (as of writing)
+    # NOTE: Pyrender's run_in_thread does not work on Windows directly after installation (as of writing)
     # Use the workaround detailed in
     # https://github.com/mmatl/pyrender/issues/11#issuecomment-471390076
-    v = pyrender.Viewer(scene, use_raymond_lighting=True, run_in_thread=True)
+    v = pyrender.Viewer(
+        scene,
+        viewport_size=(1280, 720),
+        use_raymond_lighting=True,
+        lighting_intensity=5,
+        refresh_rate=30,
+        # rotate=True,
+        run_in_thread=True
+    )
     t = Thread(target=event_loop)
     t.start()
     v.start_app()
