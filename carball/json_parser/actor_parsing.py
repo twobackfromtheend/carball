@@ -125,10 +125,6 @@ def convert_to_radians(data_dict: dict) -> dict:
         if data_dict['rot_z'] > math.pi:
             data_dict['rot_z'] -= 2 * math.pi
         data_dict['rot_z'] *= -1
-
-        # data_dict['rot_x'] *= -2 * math.pi / 65535 - 0.5
-        # data_dict['rot_y'] = (data_dict['rot_y'] / 65535 - 0.5) * 2 * math.pi
-        # data_dict['rot_z'] *= -2 * math.pi / 65535
     except TypeError:
         pass
     return data_dict
