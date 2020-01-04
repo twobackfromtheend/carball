@@ -5,26 +5,34 @@ import "api/game/player_id.proto";
 package api.events;
 
 message PlayerPressureStats {
-    uint32 hits = 1;
-    bool goal = 2;
-    bool assist = 3;
-    uint32 shots = 4;
-    uint32 saves = 5;
+    api.game.PlayerId player_id = 1;
 
-    uint32 passes = 6;
+    uint32 hits = 2;
+    bool goal = 3;
+    bool assist = 4;
+    uint32 shots = 5;
+    uint32 saves = 6;
 
-    float ball_hit_forward = 7;
-    float boost_used = 8;
-    float average_speed = 9;
+    uint32 passes = 7;
+    uint32 dribbles = 8;
+
+    float boost_used = 10;
+    float average_speed = 11;
 
 }
 
 message Pressure {
-    uint32 start_frame_number = 1;
-    uint32 end_frame_number = 2;
+    bool is_orange = 1;
+    uint32 start_frame_number = 2;
+    uint32 end_frame_number = 3;
 
-    float duration = 3;
-    float time_since_last_possession = 4;
+    sint32 goal_number = 4;
 
-    repeated PlayerPressureStats player_stats = 5;
+    float duration = 5;
+    float time_since_last_pressure = 6;
+
+    bool previous_pressure_is_orange = 7;
+//    Only valid if time_since_last_pressure nonzero, indicating that there was a previous pressure.
+
+    repeated PlayerPressureStats player_stats = 8;
 }

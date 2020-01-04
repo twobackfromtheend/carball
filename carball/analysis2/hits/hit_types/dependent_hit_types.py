@@ -3,12 +3,12 @@ from typing import Dict
 import pandas as pd
 
 from api.events.hit_pb2 import Hit
+from api.game.game_pb2 import Game
 from carball.json_parser.game import Game as JsonParserGame
 
 
-def set_hit_type_dependent_on_previous_hit(hits_by_goal_number: Dict[int, Hit], json_parser_game: JsonParserGame,
-                                           df: pd.DataFrame):
-    player_id_to_team = {player.online_id: player.is_orange for player in json_parser_game.players}
+def set_hit_type_dependent_on_previous_hit(hits_by_goal_number: Dict[int, Hit], game: Game):
+    player_id_to_team = {player.id.id: player.is_orange for player in game.players}
 
     for hits_list in hits_by_goal_number.values():
         previous_hit = None

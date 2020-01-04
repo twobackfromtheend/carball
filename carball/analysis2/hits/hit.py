@@ -4,18 +4,18 @@ from typing import List, Dict
 import numpy as np
 import pandas as pd
 from rlutilities.linear_algebra import vec3
-from rlutilities.simulation import Game, Ball
+from rlutilities.simulation import Ball, Game as RLUGame
 
 from api.events.events_pb2 import Events
-from carball.json_parser.game import Game as JsonParserGame
+from api.game.game_pb2 import Game
 from carball.output_generation.data_frame_generation.prefixes import DF_GAME_PREFIX, DF_BALL_PREFIX
 
 logger = logging.getLogger(__name__)
 
 
-def get_hits(events: Events, json_parser_game: JsonParserGame, df: pd.DataFrame):
+def get_hits(events: Events, game: Game, df: pd.DataFrame):
     hit_frame_numbers = get_hit_frame_numbers(df)
-    player_names = [player.name for player in json_parser_game.players]
+    player_names = [player.name for player in game.players]
     hit_frames_df = df.loc[hit_frame_numbers, :]
     ball_df = hit_frames_df[DF_BALL_PREFIX].loc[:, ['pos_x', 'pos_y', 'pos_z']]
     player_distances = {}
@@ -25,14 +25,14 @@ def get_hits(events: Events, json_parser_game: JsonParserGame, df: pd.DataFrame)
         player_distances[player_name] = player_distance
     player_distances_df = pd.DataFrame.from_dict(player_distances)
 
-    player_name_to_team: Dict[str, int] = {player.name: int(player.team.is_orange) for player in
-                                           json_parser_game.players}
+    player_name_to_team: Dict[str, int] = {player.name: int(player.is_orange) for player in
+                                           game.players}
     columns = [(player_name_to_team[player_name], player_name)
                for player_name in player_distances_df.columns]
     player_distances_df.columns = pd.MultiIndex.from_tuples(columns)
 
     player_distances_df[('closest_player', 'name')] = None
-    # player_distances_df[('closest_player', 'distance')] = None
+
     for hit_team_no in [0, 1]:
         try:
             player_distances_for_team = player_distances_df[hit_team_no].loc[
@@ -40,10 +40,6 @@ def get_hits(events: Events, json_parser_game: JsonParserGame, df: pd.DataFrame)
 
             small_player_distances_for_team = player_distances_for_team[(player_distances_for_team < 350).any(axis=1)]
 
-            # player_distances_df[('closest_player', 'distance')].fillna(
-            #     small_player_distances_for_team.min(axis=1),
-            #     inplace=True
-            # )
             player_distances_df[('closest_player', 'name')].fillna(
                 small_player_distances_for_team.idxmin(axis=1),
                 inplace=True
@@ -57,7 +53,7 @@ def get_hits(events: Events, json_parser_game: JsonParserGame, df: pd.DataFrame)
     hits_data = player_distances_df['closest_player'].dropna()
     # dropped_frames = [frame for frame in player_distances_df.index if frame not in hits_data.index]
     # print("dropped", dropped_frames)
-    player_name_to_id: Dict[str, str] = {player.name: player.online_id for player in json_parser_game.players}
+    player_name_to_id: Dict[str, str] = {player.name: player.id.id for player in game.players}
     goal_numbers = df.loc[hits_data.index, (DF_GAME_PREFIX, 'goal_number')].to_dict()
 
     previous_hit = None
@@ -86,7 +82,7 @@ def get_hit_frame_numbers(df: pd.DataFrame):
     logger.info(f"hit: {hit_frame_numbers}")
 
     delta_df = df.loc[:, (DF_GAME_PREFIX, 'delta')]
-    Game.set_mode("soccar")
+    RLUGame.set_mode("soccar")
     filtered_hit_frame_numbers = []
     for frame_number in hit_frame_numbers:
         previous_frame_number = frame_number - 1

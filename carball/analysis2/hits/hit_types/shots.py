@@ -2,21 +2,21 @@ from typing import Dict
 
 import pandas as pd
 from rlutilities.linear_algebra import vec3
-from rlutilities.simulation import Game, Ball
+from rlutilities.simulation import Game as RLUGame, Ball
 
 from api.events.hit_pb2 import Hit
+from api.game.game_pb2 import Game
 from carball.analysis2.constants.constants import FIELD_Y_LIM
-from carball.json_parser.game import Game as JsonParserGame
 from carball.output_generation.data_frame_generation.prefixes import DF_BALL_PREFIX
 
 SHOT_SECONDS_SIMULATED = 5
 
 
-def set_shots(hits_by_goal_number: Dict[int, Hit], json_parser_game: JsonParserGame, df: pd.DataFrame):
+def set_shots(hits_by_goal_number: Dict[int, Hit], game: Game, df: pd.DataFrame):
     ball_df = df[DF_BALL_PREFIX]
-    player_id_to_team = {player.online_id: player.is_orange for player in json_parser_game.players}
+    player_id_to_team = {player.id.id: player.is_orange for player in game.players}
 
-    Game.set_mode("soccar")
+    RLUGame.set_mode("soccar")
 
     for hits_list in hits_by_goal_number.values():
         for hit in hits_list:
