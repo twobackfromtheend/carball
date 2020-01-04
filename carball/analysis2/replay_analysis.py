@@ -1,4 +1,6 @@
+import json
 import logging
+from pathlib import Path
 
 from api.events.events_pb2 import Events
 from carball.analysis2.hits.hit import get_hits
@@ -14,9 +16,15 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 def analyse_replay(replay: str):
-    with timer('Decompiling replay'):
-        # json_ = decompile_replay(replay)
-        json_ = decompile_replay(replay, output_path=replay + ".json")
+    replay_json_filepath = Path(replay + ".json")
+    if replay_json_filepath.is_file():
+        with timer('Loading previously decompiled replay'):
+            with replay_json_filepath.open("r") as f:
+                json_ = json.load(f)
+    else:
+        with timer('Decompiling replay'):
+            # json_ = decompile_replay(replay)
+            json_ = decompile_replay(replay, output_path=str(replay_json_filepath))
 
     with timer('Parsing json'):
         json_parser_game = JsonParserGame()
@@ -30,20 +38,20 @@ def analyse_replay(replay: str):
         df = create_data_frame(json_parser_game)
     # print(df.memory_usage())
 
-    events = Events()
+    events = game.events
     # with timer('Getting old hits'):
     #     # old hits
     #     old_hit_frames = BaseHit.get_hits_from_game(json_parser_game, None, None, df, None)
 
     with timer('Getting hits'):
         # new hits
-        get_hits(events, json_parser_game, df)
+        get_hits(events, game, df)
 
     with timer('Calculating hit types'):
-        calculate_hit_types(events.hits, json_parser_game, df)
+        calculate_hit_types(events.hits, game, df)
 
     with timer('Calculating pressures'):
-        calculate_pressures(events.hits, json_parser_game, df)
+        calculate_pressures(events, game, df)
 
     with timer("Calculating stats"):
         analysis = calculate_stats(events, game, df)
