@@ -72,7 +72,7 @@ def check_value_ranges(df: pd.DataFrame):
     ]
     for rot_name, limits in rot_limits:
         rot_df = df.loc[:, (slice(None), rot_name)].fillna(0)
-        assert ((limits[0] <= rot_df) & (rot_df <= limits[1])).all(axis=None)
+        assert ((limits[0] - 1e-4 <= rot_df) & (rot_df <= limits[1] + 1e-4)).all(axis=None)
 
     # Velocity
     for player_name in player_names:
