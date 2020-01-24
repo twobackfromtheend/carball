@@ -53,7 +53,7 @@ def calculate_stats(events: Events, game: Game, df: pd.DataFrame):
     with timer("\tCalculating possession stats"):
         set_possession_stats(player_stats, hits, df)
     with timer("\tCalculating demo stats"):
-        set_demo_stats(player_stats, game, player_blue_data_frames)
+        set_demo_stats(player_stats, game, game.events.demos, player_blue_data_frames)
 
     for player in game.players:
         player_name = player.name

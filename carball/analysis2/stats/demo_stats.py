@@ -1,15 +1,18 @@
 from collections import Counter
-from typing import Dict
+from typing import Dict, List
 
 import numpy as np
 import pandas as pd
 
 from api.analysis.stats_pb2 import PlayerStats
+from api.events.demo_pb2 import Demo
 from api.game.game_pb2 import Game
 from carball.analysis2.constants.constants import FIELD_Y_LIM, FIELD_X_LIM
 
 
-def set_demo_stats(player_stats: Dict[str, PlayerStats], game: Game, player_blue_data_frames: Dict[str, pd.DataFrame]):
+def set_demo_stats(player_stats: Dict[str, PlayerStats],
+                   game: Game, demos: List[Demo],
+                   player_blue_data_frames: Dict[str, pd.DataFrame]):
     player_id_to_name: Dict[str, str] = {player.id.id: player.name for player in game.players}
 
     demo_counts = Counter()
@@ -18,7 +21,7 @@ def set_demo_stats(player_stats: Dict[str, PlayerStats], game: Game, player_blue
     demoed_near_own_goal_counts = Counter()
     active_frames = list(player_blue_data_frames.values())[0].index
 
-    for demo in game.events.demos:
+    for demo in demos:
         frame_number = demo.frame_number
         if frame_number not in active_frames:
             continue
