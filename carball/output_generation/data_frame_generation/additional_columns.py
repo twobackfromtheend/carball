@@ -53,8 +53,13 @@ def add_boost_collect_to_df(df: pd.DataFrame, json_parser_game: JsonParserGame):
             player_position = df.loc[frame_number, (player_name, ['pos_x', 'pos_y', 'pos_z'])].values.astype(np.float64)
 
             current_frame_boost = player_boost_series.loc[frame_number]
-            previous_frame_boost = player_boost_series.loc[frame_number - 1]
-            previous_frame_boost_active = df.loc[frame_number - 1, (player_name, 'boost_active')]
+            previous_frame_number = frame_number - 1
+            if previous_frame_number not in player_boost_series.index:
+                logger.warning(f"Skipping possible boost collection on frame {frame_number} "
+                               f"as previous frame not in index.")
+                continue
+            previous_frame_boost = player_boost_series.loc[previous_frame_number]
+            previous_frame_boost_active = df.loc[previous_frame_number, (player_name, 'boost_active')]
             if (current_frame_boost > previous_frame_boost) or \
                     (current_frame_boost == 100 and previous_frame_boost == 100 and previous_frame_boost_active):
                 try:
