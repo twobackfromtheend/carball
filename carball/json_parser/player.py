@@ -267,6 +267,8 @@ class Player:
         elif actor_type == "play_station":
             id_ = int.from_bytes(bytes([play_station_bit_swap(byte_) for byte_ in id_data[1][-8:]]), byteorder='little')
             self.online_id = str(id_)
+        elif actor_type == 'xbox':
+            self.online_id = id_data
         else:
             raise RuntimeError(f"Unknown actor type: {actor_type}")
             pass
