@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package api.analysis;
+
+
+message BallStats {
+    // Movement
+    float distance_travelled = 201;
+    float average_speed = 202;
+    float time_at_supersonic = 203;
+    float time_at_boost_speed = 204;
+    float time_at_slow_speed = 205;
+
+    // Positioning
+    float time_high_in_air = 301;
+    float time_in_air = 302;
+    float time_on_ground = 303;
+    float time_in_orange_half = 304;
+    float time_in_blue_half = 305;
+    float time_in_orange_third = 306;
+    float time_in_neutral_third = 307;
+    float time_in_blue_third = 308;
+}

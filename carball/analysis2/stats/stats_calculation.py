@@ -9,6 +9,7 @@ from api.analysis.stats_pb2 import PlayerStats
 from api.events.events_pb2 import Events
 from api.game.game_pb2 import Game
 from carball.analysis2.data_frame_filters.data_frame_filters import get_flipped_data_frame
+from carball.analysis2.stats.ball_stats import set_ball_stats
 from carball.analysis2.stats.boost_stats import set_boost_stats
 from carball.analysis2.stats.demo_stats import set_demo_stats
 from carball.analysis2.stats.movement_stats import set_movement_stats
@@ -55,8 +56,9 @@ def calculate_stats(events: Events, game: Game, df: pd.DataFrame):
     with timer("\tCalculating demo stats"):
         set_demo_stats(player_stats, game, game.events.demos, player_blue_data_frames)
 
-    for player in game.players:
-        player_name = player.name
+    ball_stats = analysis.ball_stats
+    with timer("\tCalculating ball stats"):
+        set_ball_stats(ball_stats, active_frames_df)
     return analysis
 
 

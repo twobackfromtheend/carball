@@ -1,11 +1,13 @@
 syntax = "proto3";
 
 import "api/analysis/stats.proto";
+import "api/analysis/ball_stats.proto";
 
 package api.analysis;
 
 
 message Analysis {
     repeated PlayerStats player_stats = 2;
+    BallStats ball_stats = 3;
 }
 
