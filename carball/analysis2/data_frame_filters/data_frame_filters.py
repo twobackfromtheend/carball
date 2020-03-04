@@ -33,8 +33,11 @@ def get_attacking_third(data_frame: pd.DataFrame):
     return data_frame.pos_y > FIELD_Y_THIRD
 
 
-def get_neutral_third(data_frame: pd.DataFrame):
-    return data_frame.pos_y.abs() < FIELD_Y_THIRD
+def get_neutral_third(data_frame: pd.DataFrame, include_zero: bool = False):
+    if include_zero:
+        return data_frame.pos_y.abs() < FIELD_Y_THIRD
+    else:
+        return (data_frame.pos_y.abs() < FIELD_Y_THIRD) & (data_frame.pos_y != 0)
 
 
 def get_defending_third(data_frame: pd.DataFrame):
