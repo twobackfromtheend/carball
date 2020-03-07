@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package api.game.metadata;
+
+message PlayerLoadout {
+    uint32 banner = 1;
+    uint32 boost = 2;
+    uint32 car = 3;
+    uint32 goal_explosion = 4;
+    uint32 skin = 5;
+    uint32 trail = 6;
+    uint32 wheels = 7;
+    uint32 version = 8;
+    uint32 topper = 9;
+    uint32 antenna = 10;
+    uint32 engine_audio = 11;
+    uint32 avatar_border = 12;
+
+    uint32 banner_paint = 13;
+    uint32 boost_paint = 14;
+    uint32 car_paint = 15;
+    uint32 goal_explosion_paint = 16;
+    uint32 skin_paint = 17;
+    uint32 trail_paint = 18;
+    uint32 wheels_paint = 19;
+    uint32 topper_paint = 20;
+    uint32 antenna_paint = 21;
+
+    uint32 primary_color = 22;
+    uint32 accent_color = 23;
+    uint32 primary_finish = 24;
+    uint32 accent_finish = 25;
+
+    uint64 banner_user_color = 26;
+    uint64 avatar_border_user_color = 27;
+}

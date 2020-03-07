@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package api.game.metadata;
+
+message CameraSettings {
+    float stiffness = 1;
+    float height = 2;
+    float transition_speed = 3;
+    float pitch = 4;
+    float swivel_speed = 5;
+    float field_of_view = 6;
+    float distance = 7;
+}

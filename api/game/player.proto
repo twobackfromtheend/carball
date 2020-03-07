@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+import "api/game/metadata/player_loadout.proto";
+import "api/game/metadata/camera_settings.proto";
+import "api/game/player_id.proto";
+
+package api.game;
+
+message Player {
+    PlayerId id = 1;
+    string name = 2;
+    uint32 title = 3;
+    uint32 score = 4;
+    uint32 goals = 5;
+    uint32 assists = 6;
+    uint32 saves = 7;
+    uint32 shots = 8;
+    api.game.metadata.CameraSettings camera_settings = 9;
+    api.game.metadata.PlayerLoadout loadout = 10;
+    bool is_orange = 11;
+    PlayerId party_leader = 12;
+    bool is_bot = 13;
+    float time_in_game = 14;
+    uint32 first_frame_in_game = 15;
+}

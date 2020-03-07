@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package api.game;
+
+message PlayerId {
+    string id = 1;
+}

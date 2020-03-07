@@ -6,7 +6,7 @@ positional_columns = ['pos_x', 'pos_y', 'pos_z', 'rot_x', 'rot_y', 'rot_z']
 
 def get_player_ball_displacements(data_frame: pd.DataFrame, player_name: str) -> pd.DataFrame:
     player_df = data_frame[player_name]
-    ball_df = data_frame['ball']
+    ball_df = data_frame['ball__']
 
     return get_position_displacements(player_df, ball_df)
 

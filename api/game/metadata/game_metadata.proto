@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+import "api/game/player_id.proto";
+
+package api.game.metadata;
+
+enum Playlist {
+    UNKNOWN = 0;
+    UNRANKED_DUELS = 1;
+    UNRANKED_DOUBLES = 2;
+    UNRANKED_STANDARD = 3;
+    UNRANKED_CHAOS = 4;
+    CUSTOM_LOBBY = 6;
+    OFFLINE_SPLITSCREEN = 8;
+    RANKED_DUELS = 10;
+    RANKED_DOUBLES = 11;
+    RANKED_SOLO_STANDARD = 12;
+    RANKED_STANDARD = 13;
+    UNRANKED_SNOW_DAY = 15;
+    ROCKET_LABS = 16;
+    UNRANKED_HOOPS = 17;
+    UNRANKED_RUMBLE = 18;
+    TOURNAMENT = 22;
+    UNRANKED_DROPSHOT = 23;
+    ANNIVERSARY = 25;
+    THIRD_PARTY = 26; // EX: Faceit
+    RANKED_HOOPS = 27;
+    RANKED_RUMBLE = 28;
+    RANKED_DROPSHOT = 29;
+    RANKED_SNOW_DAY = 30;
+}
+
+message GameScore {
+    uint32 team_0_score = 1;
+    uint32 team_1_score = 2;
+}
+
+message Goal {
+    uint32 frame_number = 1;
+    api.game.PlayerId player_id = 2;
+}
+
+message Demo {
+    uint32 frame_number = 1;
+    api.game.PlayerId attacker_id = 2;
+    api.game.PlayerId victim_id = 3;
+}
+
+message GameMetadata {
+    string id = 1;
+    string name = 2;
+    string map = 3;
+    uint32 version = 4;
+    uint64 time = 5;
+    uint32 frames = 6;
+    GameScore score = 7;
+    repeated Goal goals = 8;
+    repeated Demo demos = 9;
+    api.game.PlayerId primary_player = 10;
+    float duration = 11;
+    string game_server_id = 12;
+    string server_name = 13;
+    string match_guid = 14;
+    uint32 team_size = 15;
+    Playlist playlist = 16;
+    int32 unknown_playlist = 17;
+}

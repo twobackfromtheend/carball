@@ -1,7 +1,6 @@
-
 import logging
 import time
-from typing import List, Dict, Callable
+from typing import List, Dict, Callable, Any
 
 import numpy as np
 import pandas as pd
@@ -9,8 +8,8 @@ import pandas as pd
 from carball.analysis.constants.basic_math import position_column_names, get_player_ball_displacements, \
     positional_columns
 from .hitbox.hitbox import Hitbox
-from ....generated.api import game_pb2
-from ....generated.api.stats.events_pb2 import Hit
+from ....generated.api.game import game_pb2
+# from ....generated.api.stats.events_pb2 import Hit
 from carball.json_parser.game import Game
 
 logger = logging.getLogger(__name__)
@@ -22,7 +21,7 @@ class BaseHit:
 
     @staticmethod
     def get_hits_from_game(game: Game, proto_game: game_pb2, id_creation: Callable,
-                           data_frame: pd.DataFrame, first_touch_frames: pd.Series) -> Dict[int, Hit]:
+                           data_frame: pd.DataFrame, first_touch_frames: pd.Series) -> Dict[int, Any]:
 
         start_time = time.time()
 
@@ -36,9 +35,9 @@ class BaseHit:
             return {}
 
         # add kickoff hits
-        for hit_frame in first_touch_frames:
-            if hit_frame not in hit_frame_numbers:
-                hit_frame_numbers.append(hit_frame)
+        # for hit_frame in first_touch_frames:
+        #     if hit_frame not in hit_frame_numbers:
+        #         hit_frame_numbers.append(hit_frame)
 
         hit_frame_numbers.sort()
 
@@ -80,7 +79,7 @@ class BaseHit:
         for hit_team_no in [0, 1]:
             try:
                 collision_distances_for_team = collision_distances_data_frame[
-                    hit_team_no].loc[data_frame.ball['hit_team_no'] == hit_team_no]
+                    hit_team_no].loc[data_frame.ball__['hit_team_no'] == hit_team_no]
 
                 close_collision_distances_for_team = collision_distances_for_team[
                     (collision_distances_for_team < 300).any(axis=1)
@@ -105,22 +104,23 @@ class BaseHit:
         if len(hits_data) > 1:
             hit_frames_to_keep = BaseHit.filter_out_duplicate_hits(hits_data)
             hits_data = hits_data.loc[hit_frames_to_keep]
-
-        for row in hits_data.itertuples():
-            frame_number, player_name, collision_distance = row.Index, row.name, row.distance
-            hit = proto_game.game_stats.hits.add()
-            hit.frame_number = frame_number
-            goal_number = data_frame.at[frame_number, ('game', 'goal_number')]
-            if not np.isnan(goal_number):
-                hit.goal_number = int(goal_number)
-            id_creation(hit.player_id, player_name)
-            hit.collision_distance = collision_distance
-            ball_position = data_frame.ball.loc[frame_number, position_column_names]
-            hit.ball_data.pos_x = float(ball_position['pos_x'])
-            hit.ball_data.pos_y = float(ball_position['pos_y'])
-            hit.ball_data.pos_z = float(ball_position['pos_z'])
-            hit.is_kickoff = hit.frame_number in first_touch_frames
-            all_hits[frame_number] = hit
+        print(hits_data.index.values)
+        return hits_data.index.values
+        # for row in hits_data.itertuples():
+        #     frame_number, player_name, collision_distance = row.Index, row.name, row.distance
+        #     hit = proto_game.game_stats.hits.add()
+        #     hit.frame_number = frame_number
+        #     goal_number = data_frame.at[frame_number, ('game', 'goal_number')]
+        #     if not np.isnan(goal_number):
+        #         hit.goal_number = int(goal_number)
+        #     id_creation(hit.player_id, player_name)
+        #     hit.collision_distance = collision_distance
+        #     ball_position = data_frame.ball.loc[frame_number, position_column_names]
+        #     hit.ball_data.pos_x = float(ball_position['pos_x'])
+        #     hit.ball_data.pos_y = float(ball_position['pos_y'])
+        #     hit.ball_data.pos_z = float(ball_position['pos_z'])
+        #     hit.is_kickoff = hit.frame_number in first_touch_frames
+        #     all_hits[frame_number] = hit
 
         time_diff = time.time() - hit_creation_time
         logger.info('ball hit creation time: %s', time_diff * 1000)
@@ -195,16 +195,16 @@ class BaseHit:
 
     @staticmethod
     def get_hit_frame_numbers_by_ball_ang_vel(data_frame: pd.DataFrame) -> List[int]:
-        if 'ang_vel_x' not in data_frame.ball:
+        if 'ang_vel_x' not in data_frame.ball__:
             return []
-        ball_ang_vels = data_frame.ball.loc[:, ['ang_vel_x', 'ang_vel_y', 'ang_vel_z']]
+        ball_ang_vels = data_frame.ball__.loc[:, ['ang_vel_x', 'ang_vel_y', 'ang_vel_z']]
         diff_series = ball_ang_vels.diff().any(axis=1)
         indices = diff_series.index[diff_series].tolist()
         return indices
 
     @staticmethod
-    def get_ball_data(data_frame: pd.DataFrame, hit: Hit):
-        return data_frame.ball.loc[hit.frame_number, :]
+    def get_ball_data(data_frame: pd.DataFrame, hit: Any):
+        return data_frame.ball__.loc[hit.frame_number, :]
 
 
 def get_rotation_matrices(data_frame: pd.DataFrame, player_name: str) -> pd.Series:

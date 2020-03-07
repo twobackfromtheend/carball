@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+import "api/game/player_id.proto";
+
+package api.analysis;
+
+message Hit {
+    uint32 frame_number = 1;
+    api.game.PlayerId player_id = 2;
+
+    uint32 previous_hit_frame_number = 3;
+    uint32 next_hit_frame_number = 4;
+    sint32 goal_number = 5;
+
+    bool goal = 10;
+    bool assist = 11;
+    bool save = 12;
+    bool shot = 13;
+    bool secondary_assist = 14;
+
+    bool pass_ = 15;
+    bool passed = 16;
+    bool dribble = 17;
+    bool dribble_continuation = 18;
+}

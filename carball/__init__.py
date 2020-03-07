@@ -1,5 +1,6 @@
 try:
-    from carball.decompile_replays import decompile_replay
-    from carball.decompile_replays import analyze_replay_file
+    # from carball.decompile_replays import decompile_replay
+    # from carball.decompile_replays import analyze_replay_file
+    pass
 except ModuleNotFoundError as e:
     print("Not importing functions due to missing packages:", e)

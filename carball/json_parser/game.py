@@ -2,7 +2,7 @@ import json
 import logging
 import re
 from datetime import datetime
-from typing import List
+from typing import List, Dict
 
 import pandas as pd
 
@@ -44,10 +44,8 @@ class Game:
         self.frames = None
         self.kickoff_frames = None
         self.ball = None
-        self.ball_type = None
         self.demos = None
-        self.parties = None
-        self.dropshot = None
+        self.parties: Dict[str, List[str]] = None
 
     def initialize(self, file_path='', loaded_json=None, parse_replay: bool = True, clean_player_names: bool = False):
         self.file_path = file_path
@@ -264,59 +262,6 @@ class Game:
 
         # PARTIES
         self.parties = all_data['parties']
-
-        # DROPSHOT EVENTS
-        if 'dropshot_phase' in self.ball:
-            self.ball['dropshot_phase'] = self.ball['dropshot_phase'].astype('int8')
-
-        for column in self.frames.columns:
-            if column.startswith('dropshot_tile'):
-                self.frames[column] = self.frames[column].astype('int8')
-
-        self.dropshot = {
-            'damage_events': []
-        }
-
-        damage_events = all_data['dropshot']['damage_events']
-        ball_events = all_data['dropshot']['ball_events']
-
-        if len(damage_events) > 1:
-            # sometimes damages can trickle over to the next frame, clean those up
-            frames = list(damage_events.keys())
-
-            i = 0
-            while i < len(frames) - 1:
-                if frames[i] + 1 == frames[i + 1] and damage_events[frames[i]][0] == damage_events[frames[i + 1]][0]:
-                    ball_event = next(event for event in reversed(ball_events) if event['frame_number'] < frames[i])
-                    ball_phase = ball_event['state']
-
-                    first_frame = damage_events[frames[i]]
-                    trickle_frame = frames[i + 1]
-
-                    while trickle_frame in frames:
-                        # check if the total damage of the two frames is not more than it could be
-                        if (ball_phase == 1 and len(first_frame[1]) + len(damage_events[trickle_frame][1])) <= 7 or \
-                                (ball_phase == 2 and len(first_frame[1]) + len(damage_events[trickle_frame][1]) <= 19):
-                            first_frame[1].extend(damage_events[trickle_frame][1])
-                            damage_events.pop(trickle_frame)
-                            i += 1
-                            trickle_frame += 1
-                        else:
-                            break
-                i += 1
-
-        for frame_number, damage in damage_events.items():
-            self.dropshot['damage_events'].append({
-                'frame_number': frame_number,
-                'player': player_actor_id_player_dict[damage[0]],
-                'tiles': damage[1]
-            })
-
-        damage_frames = set(damage_events.keys())
-        self.dropshot['tile_frames'] =\
-            {k: v for (k, v) in all_data['dropshot']['tile_frames'].items() if k in damage_frames}
-
-        self.dropshot['ball_events'] = ball_events
 
         del self.replay_data
         del self.replay

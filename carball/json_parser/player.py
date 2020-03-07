@@ -18,6 +18,8 @@ class Player:
     def __init__(self):
         self.name = None
         self.online_id = None
+        self.id_network = None
+
         self.team = None  # using team class. set later.
         self.is_orange = None
         self.score = None
@@ -52,13 +54,8 @@ class Player:
 
     def create_from_actor_data(self, actor_data: dict, teams: List['Team']):
         self.name = actor_data['name']
-        if 'Engine.PlayerReplicationInfo:bBot' in actor_data and actor_data['Engine.PlayerReplicationInfo:bBot']:
-            self.is_bot = True
-            self.online_id = get_online_id_for_bot(bot_map, self)
+        self.decode_online_id(actor_data)
 
-        else:
-            actor_type = list(actor_data["Engine.PlayerReplicationInfo:UniqueId"]['unique_id']['remote_id'].keys())[0]
-            self.online_id = actor_data["Engine.PlayerReplicationInfo:UniqueId"]['unique_id']['remote_id'][actor_type]
         try:
             self.score = actor_data["TAGame.PRI_TA:MatchScore"]
         except KeyError:
@@ -246,8 +243,37 @@ class Player:
             car_data = {'team_paint': {}}
 
         for i in range(2):
+            try:
+                loadout = self.loadout[i]
+            except IndexError:
+                continue
             # default blue primary = 35, default orange primary = 33, default accent = 0, default glossy = 270
-            self.loadout[i]['primary_color'] = car_data['team_paint'].get(i, {}).get('primary_color', 35 if i == 0 else 33)
-            self.loadout[i]['accent_color'] = car_data['team_paint'].get(i, {}).get('accent_color', 0)
-            self.loadout[i]['primary_finish'] = car_data['team_paint'].get(i, {}).get('primary_finish', 270)
-            self.loadout[i]['accent_finish'] = car_data['team_paint'].get(i, {}).get('accent_finish', 270)
+            loadout['primary_color'] = car_data['team_paint'].get(i, {}).get('primary_color', 35 if i == 0 else 33)
+            loadout['accent_color'] = car_data['team_paint'].get(i, {}).get('accent_color', 0)
+            loadout['primary_finish'] = car_data['team_paint'].get(i, {}).get('primary_finish', 270)
+            loadout['accent_finish'] = car_data['team_paint'].get(i, {}).get('accent_finish', 270)
+
+    def decode_online_id(self, actor_data: dict):
+        if 'Engine.PlayerReplicationInfo:bBot' in actor_data and actor_data['Engine.PlayerReplicationInfo:bBot']:
+            self.is_bot = True
+            self.online_id = get_online_id_for_bot(bot_map, self)
+            return
+
+        actor_type = list(actor_data["Engine.PlayerReplicationInfo:UniqueId"]['unique_id']['remote_id'].keys())[0]
+        id_data = actor_data["Engine.PlayerReplicationInfo:UniqueId"]['unique_id']['remote_id'][actor_type]
+        self.id_network = actor_type
+        if actor_type == "steam":
+            self.online_id = id_data
+        elif actor_type == "play_station":
+            id_ = int.from_bytes(bytes([play_station_bit_swap(byte_) for byte_ in id_data[1][-8:]]), byteorder='little')
+            self.online_id = str(id_)
+        else:
+            raise RuntimeError(f"Unknown actor type: {actor_type}")
+            pass
+
+
+def play_station_bit_swap(b: int):
+    b = (b & 0xF0) >> 4 | (b & 0x0F) << 4
+    b = (b & 0xCC) >> 2 | (b & 0x33) << 2
+    b = (b & 0xAA) >> 1 | (b & 0x55) << 1
+    return b

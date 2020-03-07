@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+import "api/game/player_id.proto";
+
+package api.game;
+
+message Party {
+    PlayerId leader_id = 1;
+    repeated PlayerId members = 2;
+}

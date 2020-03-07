@@ -81,7 +81,7 @@ class BoostStat(BaseStat):
 
     @staticmethod
     def get_average_boost_level(player_dataframe: pd.DataFrame) -> np.float64:
-        return player_dataframe.boost.mean(skipna=True) / 255 * 100
+        return player_dataframe.boost.mean(skipna=True)
 
     @classmethod
     def get_num_stolen_boosts(cls, player_dataframe: pd.DataFrame, is_orange):

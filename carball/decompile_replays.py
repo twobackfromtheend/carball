@@ -1,9 +1,7 @@
 import logging
 import os
 
-from carball.analysis.analysis_manager import AnalysisManager
 from carball.controls.controls import ControlsCreator
-from carball.extras.per_goal_analysis import PerGoalAnalysis
 from carball.json_parser.game import Game
 from carball.json_parser.sanity_check.sanity_check import SanityChecker
 from carball.rattletrap import run_rattletrap

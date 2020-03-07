@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+import "api/game/player_id.proto";
+
+package api.game;
+
+message Team {
+    repeated api.game.PlayerId player_ids = 1;
+    uint32 score = 2;
+    bool is_orange = 3;
+    string name = 4;
+}

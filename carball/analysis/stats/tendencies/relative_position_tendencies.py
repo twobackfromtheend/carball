@@ -33,7 +33,7 @@ class RelativeTendencies(TeamTendencies):
             position_distances_time = pd.concat([
                 sum_deltas_by_player_name(data_frame, players_data_frame)
                 for players_data_frame in [last_person, first_person]
-            ], axis=1)
+            ], axis=1, sort=True)
 
             position_distances_time.fillna(value=0, inplace=True)
 

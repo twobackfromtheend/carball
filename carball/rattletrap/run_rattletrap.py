@@ -3,7 +3,7 @@ import logging
 import os
 import platform as pt
 import subprocess
-from typing import List
+from typing import List, Optional
 
 from carball.rattletrap.rattletrap_utils import get_rattletrap_binaries, download_rattletrap, get_rattletrap_path, \
     get_binary_for_platform, get_all_binaries
@@ -15,7 +15,7 @@ class RattleTrapException(Exception):
     pass
 
 
-def create_rattletrap_command(replay_path: str, output_path: str,
+def create_rattletrap_command(replay_path: str, output_path: Optional[str] = None,
                               overwrite: bool = True, rattletrap_path: str = None) -> List[str]:
     """
     Takes a path to the replay and outputs the json of that replay.
@@ -71,7 +71,8 @@ def run_rattletrap_command(command: List[str], output_path: str):
     return _json
 
 
-def decompile_replay(replay_path: str, output_path: str, overwrite: bool = True, rattletrap_path: str = None):
+def decompile_replay(replay_path: str, output_path: Optional[str] = None, overwrite: bool = True,
+                     rattletrap_path: str = None):
     """
     Takes a path to the replay and outputs the json of that replay.
 

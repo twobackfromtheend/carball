@@ -45,8 +45,9 @@ class BoostHandler(BaseActorHandler):
         else:
             boost_amount = actor.get('TAGame.CarComponent_Boost_TA:ReplicatedBoostAmount', None)
 
-        self.parser.player_data[player_actor_id][frame_number]['boost'] = boost_amount
-        self.parser.player_data[player_actor_id][frame_number]['boost_active'] = boost_is_active
+        actor_frame = self.parser.player_data[player_actor_id][frame_number]
+        actor_frame['boost'] = boost_amount / 255 * 100 if boost_amount is not None else None
+        actor_frame['boost_active'] = boost_is_active
 
 
 class BoostPickupHandler(BaseActorHandler):
@@ -68,10 +69,10 @@ class BoostPickupHandler(BaseActorHandler):
                     while frame_number_look_back >= 0:
                         try:
                             previous_boost_data = actor[frame_number_look_back]['boost']
+                            if previous_boost_data is not None:
+                                break
                         except KeyError:
-                            previous_boost_data = None
-                        if previous_boost_data is not None:
-                            break
+                            pass
                         frame_number_look_back -= 1
                     try:
                         current_boost_data = actor[frame_number]['boost']
@@ -79,10 +80,10 @@ class BoostPickupHandler(BaseActorHandler):
                         current_boost_data = None
 
                     # Ignore any phantom boosts
-                    if (previous_boost_data is not None and current_boost_data is not None and
-                            (255 > previous_boost_data < current_boost_data)):
-                        actor[frame_number]['boost_collect'] = True
-                        # set to false after acknowledging it's turned True
-                        # it does not turn back false immediately although boost is only collected once.
-                        # using actor_id!=-1
-                        boost_actor["instigator_id"] = -1
+                    if previous_boost_data is not None and current_boost_data is not None:
+                        if previous_boost_data < 255 and previous_boost_data < current_boost_data:
+                            actor[frame_number]['boost_collect'] = True
+                            # set to false after acknowledging it's turned True
+                            # it does not turn back false immediately although boost is only collected once.
+                            # using actor_id!=-1
+                            boost_actor["instigator_id"] = -1

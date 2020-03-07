@@ -1,6 +1,6 @@
 import logging
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Set
 
 if TYPE_CHECKING:
     from .player import Player
@@ -15,7 +15,7 @@ class Team:
         self.score = None
         self.actor_id = None
 
-        self.players = set()
+        self.players: Set['Player'] = set()
 
     def __repr__(self):
         if self.is_orange is not None:
