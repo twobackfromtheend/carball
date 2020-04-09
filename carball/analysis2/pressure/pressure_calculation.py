@@ -26,7 +26,7 @@ def calculate_pressures(events: Events, game: Game, df: pd.DataFrame):
         frame = row_tuple.Index
         goal_number = row_tuple.goal_number
         previous_goal_number = row_tuple.previous_goal_number
-        if not np.isnan(goal_number) and goal_number == previous_goal_number:
+        if not pd.isna(goal_number) and goal_number == previous_goal_number:
             if current_pressure is None:
                 if row_tuple.ball_y > FIELD_Y_THIRD:
                     current_pressure = False
