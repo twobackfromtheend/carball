@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 
 from api.events.events_pb2 import Events
