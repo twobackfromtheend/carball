@@ -101,15 +101,15 @@ def get_hit_frame_numbers(df: pd.DataFrame):
         delta_simulated = 0
         while delta_simulated < frame_delta:
             dt = 1 / 120
-            ball.step(min(dt, frame_delta - delta_simulated))
-            delta_simulated += dt
+            time_to_simulate = min(dt, frame_delta - delta_simulated)
+            ball.step(time_to_simulate)
+            delta_simulated += time_to_simulate
 
         simulated_ball_ang_vel = np.array([ball.angular_velocity[0],
                                            ball.angular_velocity[1],
                                            ball.angular_velocity[2]])
         actual_ball_ang_vel = ball_df.loc[frame_number, ['ang_vel_x', 'ang_vel_y', 'ang_vel_z']].values
-        actual_ang_vel_change = ((initial_ang_vel - actual_ball_ang_vel) ** 2).sum() ** 0.5
-
+        actual_ang_vel_change = ((actual_ball_ang_vel - initial_ang_vel) ** 2).sum() ** 0.5
         end_ang_vel_difference = ((simulated_ball_ang_vel - actual_ball_ang_vel) ** 2).sum() ** 0.5
 
         relative_ang_vel_difference = end_ang_vel_difference / actual_ang_vel_change

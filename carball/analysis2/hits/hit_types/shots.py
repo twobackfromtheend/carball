@@ -2,7 +2,7 @@ from typing import Dict
 
 import pandas as pd
 from rlutilities.linear_algebra import vec3
-from rlutilities.simulation import Game as RLUGame, Ball
+from rlutilities.simulation import Ball
 
 from api.events.hit_pb2 import Hit
 from api.game.game_pb2 import Game
@@ -15,8 +15,6 @@ SHOT_SECONDS_SIMULATED = 5
 def set_shots(hits_by_goal_number: Dict[int, Hit], game: Game, df: pd.DataFrame):
     ball_df = df[DF_BALL_PREFIX]
     player_id_to_team = {player.id.id: player.is_orange for player in game.players}
-
-    RLUGame.set_mode("soccar")
 
     for hits_list in hits_by_goal_number.values():
         for hit in hits_list:
