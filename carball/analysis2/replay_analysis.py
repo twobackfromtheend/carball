@@ -14,20 +14,18 @@ from carball.rattletrap.run_rattletrap import decompile_replay
 logging.basicConfig(level=logging.DEBUG)
 
 
-def analyse_replay(replay: str, output_json_path: str = None):
-    if output_json_path is None:
-        replay_json_filepath = Path(replay + ".json")
-    else:
-        replay_json_filepath = Path(output_json_path)
+def analyse_replay(replay: str, output_path: str = None):
+    json_ = None
+    if output_path is not None:
+        output_path_ = Path(output_path)
+        if output_path_.is_file():
+            with timer('Loading previously decompiled replay'):
+                with output_path_.open("r") as f:
+                    json_ = json.load(f)
 
-    if replay_json_filepath.is_file():
-        with timer('Loading previously decompiled replay'):
-            with replay_json_filepath.open("r") as f:
-                json_ = json.load(f)
-    else:
+    if json_ is None:
         with timer('Decompiling replay'):
-            # json_ = decompile_replay(replay)
-            json_ = decompile_replay(replay, output_path=str(replay_json_filepath))
+            json_ = decompile_replay(replay, output_path=output_path)
 
     with timer('Parsing json'):
         json_parser_game = JsonParserGame()
