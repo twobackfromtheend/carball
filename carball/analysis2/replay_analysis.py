@@ -2,7 +2,6 @@ import json
 import logging
 from pathlib import Path
 
-from api.events.events_pb2 import Events
 from carball.analysis2.hits.hit import get_hits
 from carball.analysis2.hits.hit_types.hit_type_calculation import calculate_hit_types
 from carball.analysis2.pressure.pressure_calculation import calculate_pressures
@@ -15,8 +14,12 @@ from carball.rattletrap.run_rattletrap import decompile_replay
 logging.basicConfig(level=logging.DEBUG)
 
 
-def analyse_replay(replay: str):
-    replay_json_filepath = Path(replay + ".json")
+def analyse_replay(replay: str, output_json_path: str = None):
+    if output_json_path is None:
+        replay_json_filepath = Path(replay + ".json")
+    else:
+        replay_json_filepath = Path(output_json_path)
+
     if replay_json_filepath.is_file():
         with timer('Loading previously decompiled replay'):
             with replay_json_filepath.open("r") as f:
