@@ -236,7 +236,13 @@ class Player:
         :param _dict:
         :return:
         """
-        self.data = pd.DataFrame.from_dict(_dict, orient='index')
+        data_frame = pd.DataFrame.from_dict(_dict, orient='index')
+        if self.data is None:
+            self.data = data_frame
+        else:
+            logger.warning(f'Found exisiting DataFrame for player: {self.name}. '
+                           f'Attempting combine_first on DataFrames of shape {self.data.shape} and {data_frame.shape}.')
+            self.data = self.data.combine_first(data_frame)
 
     def get_data_from_car(self, car_data):
         if car_data is None:

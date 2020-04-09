@@ -1,7 +1,10 @@
+import logging
 import re
 from typing import Optional
 
 from .base import *
+
+logger = logging.getLogger(__name__)
 
 REPLICATED_PICKUP_KEY = 'TAGame.VehiclePickup_TA:ReplicatedPickupData'
 REPLICATED_PICKUP_KEY_168 = 'TAGame.VehiclePickup_TA:NewReplicatedPickupData'
@@ -65,4 +68,5 @@ class BoostPickupHandler(BaseActorHandler):
                 # it does not turn back false immediately although boost is only collected once.
                 # using actor_id!=-1
                 pickup_actor["instigator_id"] = -1
-
+            else:
+                logger.warning(f"Unknown instigator_id for Pickup: {car_actor_id}")
