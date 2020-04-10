@@ -59,7 +59,7 @@ def get_hits(events: Events, game: Game, df: pd.DataFrame):
     previous_hit = None
     for frame_number, player_name in hits_data.name.iteritems():
         goal_number = goal_numbers[frame_number]
-        if np.isnan(goal_number):
+        if pd.isna(goal_number):
             continue
         hit = events.hits.add()
         hit.frame_number = frame_number
