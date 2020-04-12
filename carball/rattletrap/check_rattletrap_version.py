@@ -21,7 +21,7 @@ def update_rattletrap():
         response = request.urlopen('https://api.github.com/repos/tfausak/rattletrap/releases/latest')
         js = json.loads(response.read())
         github_ver = StrictVersion(js['name'])
-    except:
+    except Exception:
         log.warning('Unable to download rattletrap copying backup')
         # unable to download a new rattletrap version so we should just copy our own
         github_ver = StrictVersion(cur_ver)
@@ -31,7 +31,7 @@ def update_rattletrap():
     if len(binaries) > 0:
         binary = get_highest_binary(binaries)
         if 'cloud' in binary:
-            log.warning('Cloud parser is highest binary')
+            log.warning('Cloud parser is highest binary.')
             copy_cloud_over_to_rattletrap(binaries)
         cur_ver = get_binary_version(binary)
     update = github_ver > cur_ver
@@ -46,7 +46,7 @@ def update_rattletrap():
             log.info('Downloading {}'.format(asset['name']))
             new_file = os.path.join(path, asset['name'])
             request.urlretrieve(asset['browser_download_url'], filename=new_file)
-            log.info('making file executable', new_file)
+            log.info('Making file executable: %s', new_file)
             os.chmod(new_file, 0o777)
 
 
